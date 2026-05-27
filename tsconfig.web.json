@@ -14,6 +14,10 @@
         "src/renderer/src/*"
       ]
     },
+    "strict": false,
+    "noUnusedParameters": false,
+    "noImplicitUseStrict": false,
+    "noUnusedLocals": false,
     "noImplicitAny": false,
   }
 }

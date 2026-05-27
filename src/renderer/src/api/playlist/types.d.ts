@@ -118,6 +118,8 @@ export interface Music {
    * 发行时间
    */
   releaseDate?: string
+  isFavorite: boolean
+  updateTime: number
   [property: string]: any
 }
 

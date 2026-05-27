@@ -4,12 +4,16 @@ import { getIndexPlayList, getIndexPlayListTags, getPlayListByTag } from '@rende
 import { onMounted, ref, watch } from 'vue'
 import GridView from '@renderer/components/GridView.vue'
 import LoadingLayout from '@renderer/components/LoadingLayout.vue'
+import useWindow from '@renderer/composeable/useWindow'
 
 const currentPlaylistTab = ref('')
 
+defineOptions({
+  name: 'Recommend'
+})
+
 const loading = ref(false)
 const error = ref<string | undefined>()
-
 const { data: playListTags, send: getPlaylistTags } = useRequest(getIndexPlayListTags, {
   onSuccess: (data) => {
     data.unshift({
@@ -36,6 +40,7 @@ const { data: musicList, send: getPlaylistMusic } = useRequest(
 watch(
   currentPlaylistTab,
   async () => {
+    console.log('getMusicList')
     loading.value = true
     try {
       await getPlaylistMusic(currentPlaylistTab.value)
@@ -49,6 +54,8 @@ watch(
     immediate: false
   }
 )
+
+const { column } = useWindow()
 
 onMounted(async () => {
   try {
@@ -76,7 +83,7 @@ function onChange(e: any) {
     }}</mdui-tab>
   </mdui-tabs>
   <loading-layout :loading="loading" :error="error">
-    <grid-view :column="5" style="margin-top: 8px">
+    <grid-view :column="column" style="margin-top: 8px">
       <router-link
         v-for="item in musicList"
         :key="item.id"

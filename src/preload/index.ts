@@ -59,6 +59,9 @@ const api = {
           reject(error)
         })
     })
+  },
+  getWindowInfo: () => {
+    return ipcRenderer.invoke('getWindowInfo')
   }
 }
 

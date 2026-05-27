@@ -4,19 +4,54 @@ import '@mdui/icons/play-arrow.js'
 import '@mdui/icons/pause.js'
 import '@mdui/icons/skip-next.js'
 import '@mdui/icons/skip-previous.js'
+import '@mdui/icons/favorite-border.js'
 import '@mdui/icons/favorite.js'
-import '@mdui/icons/playlist-play.js'
-import '@mdui/icons/loop.js'
+import '@mdui/icons/queue-music.js'
+import '@mdui/icons/shuffle.js'
 import 'mdui/components/slider.js'
-import { onMounted, ref } from 'vue'
+import '@mdui/icons/arrow-right-alt.js'
+import '@mdui/icons/volume-up.js'
+import '@mdui/icons/volume-off.js'
+import { nextTick, onMounted, ref } from 'vue'
 import { useAudioStore } from '@renderer/store/modules/audio'
 import { formatDuration } from '@renderer/utils/time'
 import PlaylistPopup from '@renderer/components/PlaylistPopup.vue'
+import { LoopMode } from '@renderer/enums/music'
+import VolumeBar from '@renderer/components/VolumeBar.vue'
+import PopupWindow from '@renderer/components/PopupWindow.vue'
+
 const audioStore = useAudioStore()
 
 const isShowPlaylist = ref(false)
+const isShowVolumeBar = ref(false)
+const slider = ref<any | null>(null)
 
-onMounted(() => {})
+function onMouseDown() {
+  audioStore.startTrackProgress()
+}
+
+async function onMouseUp(e) {
+  await nextTick()
+  console.log('onMouseUp', e.target.value)
+  audioStore.setProgress(e.target.value)
+  audioStore.stopTrackProgress()
+}
+
+onMounted(() => {
+  slider.value.labelFormatter = (value: number) => {
+    return formatDuration(value)
+  }
+})
+
+function setLoopMode() {
+  audioStore.setLoopMode(
+    audioStore.loopMode === LoopMode.SEQUENCE ? LoopMode.SHUFFLE : LoopMode.SEQUENCE
+  )
+}
+
+function favorite() {
+  audioStore.favoriteMusic(audioStore.music, true)
+}
 </script>
 
 <template>
@@ -35,38 +70,61 @@ onMounted(() => {})
     </div>
     <div style="flex: 1"></div>
     <div class="music-control">
-      <mdui-button-icon>
-        <mdui-icon-skip-previous></mdui-icon-skip-previous>
+      <mdui-button-icon title="上一首">
+        <mdui-icon-skip-previous @click="audioStore.playPrev"></mdui-icon-skip-previous>
       </mdui-button-icon>
-      <mdui-button-icon style="width: 50px; height: 50px" @click="audioStore.playOrPause">
+      <mdui-button-icon
+        title="播放/暂停"
+        style="width: 50px; height: 50px"
+        @click="audioStore.playOrPause"
+      >
         <mdui-icon-pause v-if="audioStore.isPlaying"></mdui-icon-pause>
         <mdui-icon-play-arrow v-else></mdui-icon-play-arrow>
       </mdui-button-icon>
-      <mdui-button-icon>
+      <mdui-button-icon title="下一首" @click="audioStore.playNext">
         <mdui-icon-skip-next></mdui-icon-skip-next>
       </mdui-button-icon>
     </div>
     <div class="music-operator">
-      <mdui-button-icon>
-        <mdui-icon-favorite></mdui-icon-favorite>
+      <mdui-button-icon title="设置音量" @click="isShowVolumeBar = true">
+        <mdui-icon-volume-up v-if="audioStore.volume > 0"></mdui-icon-volume-up>
+        <mdui-icon-volume-off v-else></mdui-icon-volume-off>
       </mdui-button-icon>
-      <mdui-button-icon>
-        <mdui-icon-loop></mdui-icon-loop>
+      <mdui-button-icon title="收藏/取消收藏" @click="favorite">
+        <mdui-icon-favorite-border v-if="!audioStore.music.isFavorite"></mdui-icon-favorite-border>
+        <mdui-icon-favorite v-else></mdui-icon-favorite>
       </mdui-button-icon>
-      <mdui-button-icon @click="isShowPlaylist = !isShowPlaylist">
-        <mdui-icon-playlist-play></mdui-icon-playlist-play>
+      <mdui-button-icon
+        :title="audioStore.loopMode === LoopMode.SEQUENCE ? '顺序播放' : '随机播放'"
+        @click="setLoopMode"
+      >
+        <mdui-icon-arrow-right-alt
+          v-if="audioStore.loopMode === LoopMode.SEQUENCE"
+        ></mdui-icon-arrow-right-alt>
+        <mdui-icon-shuffle v-else-if="audioStore.loopMode === LoopMode.SHUFFLE"></mdui-icon-shuffle>
+      </mdui-button-icon>
+      <mdui-button-icon title="打开播放队列" @click="isShowPlaylist = !isShowPlaylist">
+        <mdui-icon-queue-music></mdui-icon-queue-music>
       </mdui-button-icon>
     </div>
 
     <div class="progress">
       <mdui-slider
+        ref="slider"
         :value="audioStore.progress"
         :max="audioStore.music.duration"
         step="1"
+        @change="onMouseUp"
+        @focus="onMouseDown"
       ></mdui-slider>
     </div>
 
-    <playlist-popup v-model="isShowPlaylist"></playlist-popup>
+    <popup-window v-model="isShowPlaylist">
+      <playlist-popup></playlist-popup>
+    </popup-window>
+    <popup-window v-model="isShowVolumeBar">
+      <volume-bar></volume-bar>
+    </popup-window>
   </div>
 </template>
 

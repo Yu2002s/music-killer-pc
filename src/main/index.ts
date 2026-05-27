@@ -4,7 +4,7 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import request from '../utils/request'
 
-function createWindow(): void {
+function createWindow(): BrowserWindow {
   // 构建一个浏览器窗口
   const mainWindow = new BrowserWindow({
     width: 900,
@@ -42,6 +42,8 @@ function createWindow(): void {
   } else {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
+
+  return mainWindow
 }
 
 // 当 Electron 完成时，将调用此方法
@@ -66,7 +68,18 @@ app.whenReady().then(() => {
     return request(options)
   })
 
-  createWindow()
+  const mainWindow = createWindow()
+
+  ipcMain.handle('getWindowInfo', () => {
+    const size = mainWindow.getSize()
+    const position = mainWindow.getPosition()
+    return {
+      width: size[0],
+      height: size[1],
+      x: position[0],
+      y: position[1]
+    }
+  })
 
   app.on('activate', function () {
     // 在macOS上，当activate时，在应用中重新创建一个窗口是很常见的

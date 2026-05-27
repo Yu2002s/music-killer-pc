@@ -1,28 +1,61 @@
 <script setup lang="ts">
 import { Music } from '@renderer/api/playlist/types'
 import '@mdui/icons/play-arrow.js'
-import '@mdui/icons/favorite--outlined.js'
+import '@mdui/icons/favorite-border.js'
 import '@mdui/icons/favorite.js'
 import '@mdui/icons/playlist-add.js'
 import { formatDuration } from '@renderer/utils/time'
 import { useAudioStore } from '@renderer/store/modules/audio'
+import { watch } from 'vue'
 
 const audioStore = useAudioStore()
 
 interface Props {
-  list?: Music[]
+  list: Music[]
 }
 
 const props = defineProps<Props>()
 
+watch(
+  props.list,
+  (value) => {
+    // 检查歌曲是否被收藏
+    if (value.length === 0) {
+      return
+    }
+    value.forEach(async (item) => {
+      item.isFavorite = await audioStore.isFavorite(item)
+    })
+  },
+  {
+    immediate: true,
+    deep: false
+  }
+)
+
 function play(_: Music, index: number) {
-  audioStore.addPlaylist(props.list || [], index)
+  audioStore.addPlaylist(props.list, index)
+}
+
+function addPlay(m: Music) {
+  audioStore.addPlay(m, false)
+}
+
+function favorite(m: Music) {
+  m.isFavorite = !m.isFavorite
+  audioStore.favoriteMusic(m)
 }
 </script>
 
 <template>
   <div class="music-list">
-    <div v-for="(item, index) in list" :key="item.id" class="music-item">
+    <div
+      v-for="(item, index) in list"
+      :key="item.id"
+      class="music-item"
+      :class="{ active: audioStore.music.id === item.id }"
+      @dblclick="play(item, index)"
+    >
       <img class="music-img" :alt="item.name" :src="item.pic120" />
       <div class="music-info">
         <router-link class="music-name" to="" :title="item.name">{{ item.name }}</router-link>
@@ -33,14 +66,15 @@ function play(_: Music, index: number) {
       </div>
       <span class="music-duration">{{ formatDuration(item.duration) }}</span>
       <div class="music-control">
-        <mdui-button-icon class="playlist-add">
+        <mdui-button-icon class="playlist-add" @click.stop="addPlay(item)">
           <mdui-icon-playlist-add> </mdui-icon-playlist-add>
         </mdui-button-icon>
-        <mdui-button-icon class="play-arrow" @click="play(item, index)">
+        <mdui-button-icon class="play-arrow" @click.stop="play(item, index)">
           <mdui-icon-play-arrow> </mdui-icon-play-arrow>
         </mdui-button-icon>
-        <mdui-button-icon class="favorite">
-          <mdui-icon-favorite--outlined> </mdui-icon-favorite--outlined>
+        <mdui-button-icon class="favorite" @click.stop="favorite(item)">
+          <mdui-icon-favorite-border v-if="!item.isFavorite"> </mdui-icon-favorite-border>
+          <mdui-icon-favorite v-else> </mdui-icon-favorite>
         </mdui-button-icon>
       </div>
     </div>
@@ -56,11 +90,17 @@ function play(_: Music, index: number) {
     border-radius: 8px;
     overflow: hidden;
 
+    &.active {
+      background-color: rgba(var(--mdui-color-secondary-container));
+    }
+
     &:hover {
-      background-color: rgba(
-        var(--mdui-comp-ripple-state-layer-color, var(--mdui-color-on-surface)),
-        var(--mdui-state-layer-hover)
-      );
+      &:not(.active) {
+        background-color: rgba(
+          var(--mdui-comp-ripple-state-layer-color, var(--mdui-color-on-surface)),
+          var(--mdui-state-layer-hover)
+        );
+      }
 
       .music-control {
         .playlist-add,
@@ -85,10 +125,6 @@ function play(_: Music, index: number) {
       align-items: start;
 
       .music-name {
-        width: 100%;
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
         font-size: 15px;
       }
 
@@ -109,10 +145,6 @@ function play(_: Music, index: number) {
 
       .album-text {
         display: inline-block;
-        width: 100%;
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
       }
     }
 

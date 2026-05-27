@@ -1,11 +1,15 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted, onUnmounted } from 'vue'
 import Material3Tab from '@renderer/components/Material3Tab.vue'
 import 'mdui/components/tabs.js'
 import 'mdui/components/tab.js'
 import 'mdui/components/tab-panel.js'
 import { useRoute, useRouter } from 'vue-router'
 const route = useRoute()
+
+defineOptions({
+  name: 'Home'
+})
 
 const tabList = [
   {
@@ -33,6 +37,14 @@ const router = useRouter()
 function onTabChange(newVal: number) {
   router.replace(tabList[newVal].path)
 }
+
+onMounted(() => {
+  console.log('onMounted')
+})
+
+onUnmounted(() => {
+  console.log('onUnmounted')
+})
 </script>
 
 <template>
@@ -43,7 +55,7 @@ function onTabChange(newVal: number) {
   />
   <router-view>
     <template #default="{ Component }">
-      <keep-alive include="recommend,playlist,rank,artist">
+      <keep-alive :include="['Recommend', 'Playlist', 'Rank', 'Artist']">
         <component :is="Component"></component>
       </keep-alive>
     </template>

@@ -5,31 +5,31 @@ export default [
   {
     path: '/',
     component: HomeView,
-    name: 'home',
+    name: 'Home',
     meta: {
       title: '首页',
-      icon: 'home',
+      icon: 'Home',
       home: true
     },
     children: [
       {
         path: '',
-        name: 'recommend',
+        name: 'Recommend',
         component: () => import('@renderer/views/home/recommend.vue')
       },
       {
         path: '/playlist',
-        name: 'playlist',
+        name: 'Playlist',
         component: () => import('@renderer/views/playlist/index.vue')
       },
       {
         path: '/rank',
-        name: 'rank',
+        name: 'Rank',
         component: () => import('@renderer/views/home/rank.vue')
       },
       {
         path: '/artist',
-        name: 'artist',
+        name: 'Artist',
         component: () => import('@renderer/views/home/artist.vue')
       }
     ]
@@ -40,13 +40,13 @@ export default [
     component: () => import('@renderer/views/favorite/index.vue'),
     meta: {
       title: '收藏',
-      icon: 'favorite',
+      icon: 'Favorite',
       home: true
     }
   },
   {
     path: '/history',
-    name: 'history',
+    name: 'History',
     component: () => import('@renderer/views/history/index.vue'),
     meta: {
       title: '历史',
@@ -56,7 +56,7 @@ export default [
   },
   {
     path: '/download',
-    name: 'download',
+    name: 'Download',
     component: () => import('@renderer/views/download/index.vue'),
     meta: {
       title: '下载',
@@ -65,8 +65,26 @@ export default [
     }
   },
   {
+    path: '/search',
+    name: 'Search',
+    component: () => import('@renderer/views/search/index.vue'),
+    meta: {
+      title: '搜索',
+      icon: 'search'
+    }
+  },
+  {
+    path: '/setting',
+    name: 'Setting',
+    component: () => import('@renderer/views/setting/index.vue'),
+    meta: {
+      title: '设置',
+      icon: 'setting'
+    }
+  },
+  {
     path: '/playlist/detail',
-    name: 'playlistDetail',
+    name: 'PlaylistDetail',
     component: () => import('@renderer/views/playlist/detail.vue'),
     meta: {
       title: '歌单详情'
