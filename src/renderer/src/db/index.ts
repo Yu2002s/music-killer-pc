@@ -151,7 +151,7 @@ export async function getDataCount(storeName: string): Promise<number> {
     const request = db.transaction([storeName], 'readonly').objectStore(storeName).count()
 
     request.onsuccess = (event: any) => {
-      resolve(Number(event.target.result))
+      resolve(Number(event.target.result || 0))
     }
 
     request.onerror = () => {

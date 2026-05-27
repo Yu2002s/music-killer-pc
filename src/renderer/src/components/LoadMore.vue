@@ -17,6 +17,7 @@ const emit = defineEmits(['load-more'])
 
 function loadMore() {
   console.log('loadMore')
+  if (props.total === 0) return
   emit('load-more')
 }
 
