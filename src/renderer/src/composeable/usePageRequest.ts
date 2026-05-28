@@ -1,5 +1,5 @@
-import { computed, onMounted, ref, watch } from 'vue'
 import { Page } from '@renderer/types/http'
+import { computed, onMounted, ref, watch } from 'vue'
 
 interface Options<T> {
   immediate?: boolean
@@ -49,8 +49,16 @@ export default function usePageRequest<T>(
 
   if (immediate) {
     onMounted(() => {
+      console.log('onMounted, send')
       send()
     })
+  }
+
+  function refresh(...args: any) {
+    pageNo.value = 1
+    total.value = 0
+    error.value = null
+    send(...args)
   }
 
   watch([pageNo, pageSize], () => {
@@ -65,6 +73,7 @@ export default function usePageRequest<T>(
     loading,
     data,
     error,
-    send
+    send,
+    refresh
   }
 }

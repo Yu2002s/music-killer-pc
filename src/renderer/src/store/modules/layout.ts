@@ -1,12 +1,10 @@
 import { defineStore } from 'pinia'
-import { reactive } from 'vue'
-
-interface LayoutState {}
+import { reactive, ref } from 'vue'
 
 export const useLayoutStore = defineStore('layout', () => {
-  const state = reactive<LayoutState>(<LayoutState>{})
+  const isExpandBottomBar = ref(false)
 
   return {
-    state
+    isExpandBottomBar
   }
 })

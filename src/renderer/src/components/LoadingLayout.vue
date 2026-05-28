@@ -9,7 +9,6 @@ interface Props {
   enableLoadMore?: boolean
   total?: number
   itemCount?: number
-  page?: number
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -21,6 +20,11 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const emit = defineEmits(['load-more', 'refresh'])
+
+const pageNo = defineModel({
+  type: Number,
+  default: 1
+})
 
 const showMessage = computed(() => {
   const error = props.error
@@ -35,15 +39,16 @@ function refresh() {
 }
 
 function onLoadMore() {
+  pageNo.value++
   emit('load-more')
 }
 </script>
 
 <template>
-  <div v-if="loading && page === 1" class="loading">
+  <div v-if="loading && pageNo === 1" class="loading">
     <mdui-circular-progress></mdui-circular-progress>
   </div>
-  <div v-else-if="error && page === 1">
+  <div v-else-if="error && pageNo === 1">
     <p>{{ showMessage }}</p>
     <mdui-button @click="refresh">刷新</mdui-button>
   </div>

@@ -1,3 +1,4 @@
 export enum StorageKey {
-  LOOP_MODE = 'loopMode'
+  LOOP_MODE = 'loopMode',
+  BRIDGE = 'bridge'
 }

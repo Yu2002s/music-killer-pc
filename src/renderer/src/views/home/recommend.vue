@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import useRequest from '@renderer/composeable/useRequest'
 import { getIndexPlayList, getIndexPlayListTags, getPlayListByTag } from '@renderer/api/playlist'
-import { onMounted, ref, watch } from 'vue'
 import GridView from '@renderer/components/GridView.vue'
 import LoadingLayout from '@renderer/components/LoadingLayout.vue'
+import useRequest from '@renderer/composeable/useRequest'
 import useWindow from '@renderer/composeable/useWindow'
+import { onMounted, ref, watch } from 'vue'
 
 const currentPlaylistTab = ref('')
 

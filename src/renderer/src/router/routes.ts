@@ -66,12 +66,22 @@ export default [
   },
   {
     path: '/search',
-    name: 'Search',
     component: () => import('@renderer/views/search/index.vue'),
     meta: {
       title: '搜索',
       icon: 'search'
-    }
+    },
+    children: [
+      {
+        path: '',
+        name: 'Search',
+        component: () => import('@renderer/views/search/music.vue')
+      },
+      {
+        path: 'playlist',
+        component: () => import('@renderer/views/search/playlist.vue')
+      }
+    ]
   },
   {
     path: '/setting',

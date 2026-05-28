@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { useRoute } from 'vue-router'
-import { onMounted, ref } from 'vue'
 import { getPlaylistInfo } from '@renderer/api/playlist'
-import useRequest from '@renderer/composeable/useRequest'
+import { Music } from '@renderer/api/playlist/types'
 import LoadingLayout from '@renderer/components/LoadingLayout.vue'
 import MusicList from '@renderer/components/MusicList.vue'
-import { Music } from '@renderer/api/playlist/types'
+import useRequest from '@renderer/composeable/useRequest'
+import { onMounted, ref } from 'vue'
+import { useRoute } from 'vue-router'
 
 const route = useRoute()
 
@@ -37,22 +37,16 @@ const { loading, error, data, send } = useRequest(
 onMounted(() => {
   send()
 })
-
-function onLoadMore() {
-  pageNo.value++
-  send()
-}
 </script>
 
 <template>
   <loading-layout
-    :page="pageNo"
+    v-model="pageNo"
     :loading="loading"
     :total="total"
     :item-count="musicData.length"
     :error="error"
     enable-load-more
-    @load-more="onLoadMore"
   >
     <music-list v-if="data" :list="musicData" />
   </loading-layout>

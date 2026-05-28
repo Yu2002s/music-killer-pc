@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { Music } from '@renderer/api/playlist/types'
-import '@mdui/icons/play-arrow.js'
 import '@mdui/icons/favorite-border.js'
 import '@mdui/icons/favorite.js'
+import '@mdui/icons/play-arrow.js'
 import '@mdui/icons/playlist-add.js'
-import { formatDuration } from '@renderer/utils/time'
+import { Music } from '@renderer/api/playlist/types'
 import { useAudioStore } from '@renderer/store/modules/audio'
+import { formatDuration } from '@renderer/utils/time'
 import { watch } from 'vue'
 
 const audioStore = useAudioStore()
@@ -45,6 +45,13 @@ function favorite(m: Music) {
   m.isFavorite = !m.isFavorite
   audioStore.favoriteMusic(m)
 }
+
+function getMusicCover(item: Music): string {
+  if (item.pic120) {
+    return item.pic120
+  }
+  return item.pic
+}
 </script>
 
 <template>
@@ -56,7 +63,7 @@ function favorite(m: Music) {
       :class="{ active: audioStore.music.id === item.id }"
       @dblclick="play(item, index)"
     >
-      <img class="music-img" :alt="item.name" :src="item.pic120" />
+      <img class="music-img" :alt="item.name" :src="getMusicCover(item)" />
       <div class="music-info">
         <router-link class="music-name" to="" :title="item.name">{{ item.name }}</router-link>
         <router-link class="music-artist" to="">{{ item.artist }}</router-link>
@@ -91,7 +98,7 @@ function favorite(m: Music) {
     overflow: hidden;
 
     &.active {
-      background-color: rgba(var(--mdui-color-secondary-container));
+      background-color: rgb(var(--mdui-color-secondary-container));
     }
 
     &:hover {

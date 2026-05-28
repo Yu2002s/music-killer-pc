@@ -1,22 +1,18 @@
+import { LyricLine, parseLrc } from '@applemusic-like-lyrics/lyric'
+import { getMusicLyric } from '@renderer/api/lyric'
+import { getPlayInfo } from '@renderer/api/play'
+import { Music } from '@renderer/api/playlist/types'
+import lrcFile from '@renderer/assets/1.txt?raw'
+import icon from '@renderer/assets/electron.svg'
+import { addData, deleteData, getDataByKey, updateData } from '@renderer/db'
+import { Bridge, LoopMode, Quality, QualityItem, QualityType } from '@renderer/enums/music'
+import { StorageKey } from '@renderer/enums/storage'
+import { DBStoreName } from '@renderer/enums/store'
 import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
-import { Music } from '@renderer/api/playlist/types'
-import icon from '@renderer/assets/electron.svg'
-import { getPlayInfo } from '@renderer/api/play'
-import { addData, deleteData, getDataByKey, updateData } from '@renderer/db'
-import { DBStoreName } from '@renderer/enums/store'
-import { StorageKey } from '@renderer/enums/storage'
-import { LoopMode } from '@renderer/enums/music'
 
 export const useAudioStore = defineStore('audio', () => {
   const audio = new Audio()
-
-  setInterval(() => {
-    if (isTrackProgress.value) {
-      return
-    }
-    progress.value = Math.floor(audio.currentTime)
-  }, 1000)
 
   audio.addEventListener('pause', () => {
     isPlaying.value = false
@@ -32,8 +28,12 @@ export const useAudioStore = defineStore('audio', () => {
     playNext()
   })
 
-  audio.addEventListener('progress', (e) => {
-    console.log('progress', e, e.loaded / e.total)
+  audio.addEventListener('timeupdate', (e: any) => {
+    if (isTrackProgress.value) {
+      return
+    }
+    currentTime.value = e.target.currentTime * 1000
+    progress.value = Math.floor(e.target.currentTime)
   })
 
   const music = ref<Music>({
@@ -59,9 +59,13 @@ export const useAudioStore = defineStore('audio', () => {
     Number(localStorage.getItem(StorageKey.LOOP_MODE) || LoopMode.SEQUENCE)
   )
   const progress = ref(0)
+  const currentTime = ref(0)
   const isTrackProgress = ref(false)
   const isPlaying = ref(false)
   const volume = ref(audio.volume)
+  const lrcContent = ref<string>(lrcFile)
+
+  const quality = ref(getSavedQuality())
   const currentIndex = computed({
     get() {
       return playlist.value.findIndex((item) => item.id === music.value.id)
@@ -78,21 +82,43 @@ export const useAudioStore = defineStore('audio', () => {
     }
   })
 
-  watch(music, async (value: Music) => {
+  /**
+   * 通过指定码率播放音乐
+   * @param id 音乐id
+   * @param bridge 码率
+   */
+  async function playForBridge(id: number, bridge: Bridge) {
+    if (id === 0) return
     progress.value = 0
-    const playInfo = await getPlayInfo({
-      id: value.id,
-      bridge: '128kmp3'
-    })
-    audio.src = playInfo.url
-    audio.currentTime = 0
-    play()
+    try {
+      const playInfo = await getPlayInfo({
+        id,
+        bridge
+      })
+      console.log('playInfo: ', playInfo)
+      audio.src = playInfo.url
+      audio.currentTime = 0
+      play()
+    } catch (error) {
+      alert(error.message)
+    }
+  }
+
+  watch(quality, async (value) => {
+    playForBridge(music.value.id, value.value)
+  })
+
+  watch(music, async (value: Music) => {
+    playForBridge(value.id, quality.value.value)
+    // console.log(lrcFile)
+    lrcContent.value = lrcFile
     // 保存历史数据
     saveHistory(value)
   })
 
   function play(m: Music | undefined = undefined) {
     if (!m) {
+      // if (isPlaying.value) return
       audio.play()
       return
     }
@@ -235,15 +261,23 @@ export const useAudioStore = defineStore('audio', () => {
     audio.volume = val
   }
 
+  function setQuality(q: QualityItem) {
+    quality.value = q
+    localStorage.setItem(StorageKey.BRIDGE, q.value)
+  }
+
   return {
     currentIndex,
     audio,
     music,
     playlist,
+    currentTime,
     progress,
     isPlaying,
     volume,
     loopMode,
+    quality,
+    lrcContent,
     setProgress,
     play,
     pause,
@@ -259,9 +293,24 @@ export const useAudioStore = defineStore('audio', () => {
     setLoopMode,
     favoriteMusic,
     isFavorite,
-    setVolume
+    setVolume,
+    setQuality
   }
 })
+
+function getSavedQuality(): QualityItem {
+  const savedQuality = localStorage.getItem(StorageKey.BRIDGE)
+  if (!savedQuality) {
+    return Quality.MP3
+  }
+  let quality = Quality.MP3
+  Object.entries(Quality).forEach(([k, v]) => {
+    if (v.value === savedQuality) {
+      quality = Quality[k]
+    }
+  })
+  return quality
+}
 
 /**
  * 保存历史数据

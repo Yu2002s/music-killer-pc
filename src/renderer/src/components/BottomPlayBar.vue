@@ -1,29 +1,36 @@
 <script setup lang="ts">
-import 'mdui/components/button-icon.js'
-import '@mdui/icons/play-arrow.js'
-import '@mdui/icons/pause.js'
-import '@mdui/icons/skip-next.js'
-import '@mdui/icons/skip-previous.js'
+import '@mdui/icons/arrow-right-alt.js'
 import '@mdui/icons/favorite-border.js'
 import '@mdui/icons/favorite.js'
+import '@mdui/icons/high-quality.js'
+import '@mdui/icons/pause.js'
+import '@mdui/icons/play-arrow.js'
 import '@mdui/icons/queue-music.js'
 import '@mdui/icons/shuffle.js'
-import 'mdui/components/slider.js'
-import '@mdui/icons/arrow-right-alt.js'
-import '@mdui/icons/volume-up.js'
+import '@mdui/icons/skip-next.js'
+import '@mdui/icons/skip-previous.js'
 import '@mdui/icons/volume-off.js'
-import { nextTick, onMounted, ref } from 'vue'
-import { useAudioStore } from '@renderer/store/modules/audio'
-import { formatDuration } from '@renderer/utils/time'
+import '@mdui/icons/volume-up.js'
 import PlaylistPopup from '@renderer/components/PlaylistPopup.vue'
-import { LoopMode } from '@renderer/enums/music'
-import VolumeBar from '@renderer/components/VolumeBar.vue'
 import PopupWindow from '@renderer/components/PopupWindow.vue'
+import VolumeBar from '@renderer/components/VolumeBar.vue'
+import { LoopMode, QualityItem } from '@renderer/enums/music'
+import { useAudioStore } from '@renderer/store/modules/audio'
+import { useLayoutStore } from '@renderer/store/modules/layout.js'
+import { formatDuration } from '@renderer/utils/time'
+import 'mdui/components/button'
+import 'mdui/components/button-icon.js'
+import 'mdui/components/slider.js'
+import { computed, nextTick, onMounted, ref } from 'vue'
+import PlayerView from './PlayerView.vue'
+import QualitySelector from './QualitySelector.vue'
 
 const audioStore = useAudioStore()
+const layoutStore = useLayoutStore()
 
 const isShowPlaylist = ref(false)
 const isShowVolumeBar = ref(false)
+const isShowQuality = ref(false)
 const slider = ref<any | null>(null)
 
 function onMouseDown() {
@@ -52,11 +59,21 @@ function setLoopMode() {
 function favorite() {
   audioStore.favoriteMusic(audioStore.music, true)
 }
+
+function onQualityChange(e: QualityItem) {
+  isShowQuality.value = false
+  audioStore.setQuality(e)
+}
 </script>
 
 <template>
   <div class="bottom-play-bar">
-    <img class="music-img" :src="audioStore.music.pic" :alt="audioStore.music.name" />
+    <img
+      class="music-img"
+      :src="audioStore.music.pic"
+      :alt="audioStore.music.name"
+      @click="layoutStore.isExpandBottomBar = !layoutStore.isExpandBottomBar"
+    />
     <div class="music-info">
       <router-link class="name" to="">{{ audioStore.music.name }}</router-link>
       <div class="desc">
@@ -75,7 +92,8 @@ function favorite() {
       </mdui-button-icon>
       <mdui-button-icon
         title="播放/暂停"
-        style="width: 50px; height: 50px"
+        style="width: 50px; height: 50px; margin: 0 10px"
+        variant="filled"
         @click="audioStore.playOrPause"
       >
         <mdui-icon-pause v-if="audioStore.isPlaying"></mdui-icon-pause>
@@ -86,6 +104,9 @@ function favorite() {
       </mdui-button-icon>
     </div>
     <div class="music-operator">
+      <mdui-button title="音质" variant="text" @click="isShowQuality = true">{{
+        audioStore.quality.label
+      }}</mdui-button>
       <mdui-button-icon title="设置音量" @click="isShowVolumeBar = true">
         <mdui-icon-volume-up v-if="audioStore.volume > 0"></mdui-icon-volume-up>
         <mdui-icon-volume-off v-else></mdui-icon-volume-off>
@@ -119,11 +140,19 @@ function favorite() {
       ></mdui-slider>
     </div>
 
-    <popup-window v-model="isShowPlaylist">
+    <player-view></player-view>
+
+    <popup-window v-model="isShowPlaylist" animation="slide-right-left-fade">
       <playlist-popup></playlist-popup>
     </popup-window>
     <popup-window v-model="isShowVolumeBar">
       <volume-bar></volume-bar>
+    </popup-window>
+    <popup-window v-model="isShowQuality">
+      <quality-selector
+        v-model="audioStore.quality"
+        @update:model-value="onQualityChange"
+      ></quality-selector>
     </popup-window>
   </div>
 </template>
@@ -133,9 +162,6 @@ function favorite() {
   width: 100%;
   display: flex;
   align-items: center;
-
-  .audio-player {
-  }
 
   .music-img {
     cursor: pointer;

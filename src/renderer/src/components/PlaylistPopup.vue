@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { useAudioStore } from '@renderer/store/modules/audio'
+import '@mdui/icons/clear-all.js'
+import '@mdui/icons/clear.js'
 import '@mdui/icons/favorite-border.js'
 import '@mdui/icons/favorite.js'
-import '@mdui/icons/clear.js'
-import '@mdui/icons/clear-all.js'
 import { Music } from '@renderer/api/playlist/types'
+import { useAudioStore } from '@renderer/store/modules/audio'
 
 const audioStore = useAudioStore()
 
@@ -61,7 +61,8 @@ function clearAll() {
 
 <style scoped lang="scss">
 .playlist-content {
-  position: absolute;
+  position: fixed;
+  z-index: 4000;
   bottom: 100px;
   right: 30px;
   height: 400px;

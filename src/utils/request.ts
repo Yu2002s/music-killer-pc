@@ -39,11 +39,18 @@ export interface Response<T> {
   timestamp: number
 }
 
+const BASE_URL = 'http://music.jdynb.xyz'
+
 export default async function request<R>(options: Options): Promise<Response<R>> {
   const { url, method = 'GET', data, header } = options
 
+  let requestUrl = url
+  if (!url.startsWith('http')) {
+    requestUrl = BASE_URL + url
+  }
+
   return net
-    .fetch('http://music.jdynb.xyz' + url, {
+    .fetch(requestUrl, {
       method,
       body: data,
       headers: header
