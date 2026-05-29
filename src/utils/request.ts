@@ -21,6 +21,10 @@ export interface Options {
    * 是否显示错误的提示信息
    */
   showErrorTips?: boolean
+  /**
+   * 返回原始报文
+   */
+  raw?: boolean
 }
 
 /**
@@ -49,13 +53,19 @@ export default async function request<R>(options: Options): Promise<Response<R>>
     requestUrl = BASE_URL + url
   }
 
+  console.log('requestUrl:', requestUrl)
+
   return net
     .fetch(requestUrl, {
       method,
       body: data,
       headers: header
     })
-    .then((res) => {
+    .then(async (res) => {
+      if (options.raw) {
+        const text = await res.text()
+        return text
+      }
       return res.json()
     })
 }

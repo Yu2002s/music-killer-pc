@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import { useAudioStore } from '@renderer/store/modules/audio';
+import { useAudioStore } from '@renderer/store/modules/audio'
+import 'mdui/components/button'
+import { ref } from 'vue'
+
+const isShow = ref(false)
 const audioStore = useAudioStore()
 </script>
 
@@ -9,7 +13,9 @@ const audioStore = useAudioStore()
 
 <style scoped>
 .wrapper {
-  height: 300px;
-  overflow: hidden;
+  height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 </style>

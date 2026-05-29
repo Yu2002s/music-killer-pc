@@ -1,5 +1,5 @@
-import { toRaw } from 'vue'
 import { DBStoreName } from '@renderer/enums/store'
+import { toRaw } from 'vue'
 
 function UPGRADE_0_1(db: IDBDatabase) {
   const store = db.createObjectStore(DBStoreName.FAVORITE, {
@@ -116,7 +116,6 @@ export async function getDataByKey<T>(storeName: string, key: any): Promise<T> {
     }
 
     request.onsuccess = function () {
-      console.log('主键查询结果: ', request.result)
       resolve(request.result)
     }
   })

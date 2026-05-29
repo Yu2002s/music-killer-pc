@@ -25,14 +25,14 @@ function clearAll() {
 <template>
   <div class="playlist-content">
     <div class="playlist-header">
-      <div class="playlist-title">播放队列({{ audioStore.playlist.length }})</div>
+      <div class="playlist-title">播放队列({{ audioStore.musicList.length }})</div>
       <mdui-button-icon title="清空队列" @click="clearAll">
         <mdui-icon-clear-all></mdui-icon-clear-all>
       </mdui-button-icon>
     </div>
     <div class="music-list">
       <div
-        v-for="item in audioStore.playlist"
+        v-for="item in audioStore.musicList"
         :key="item.id"
         class="music-item"
         :class="{ active: audioStore.music.id === item.id }"

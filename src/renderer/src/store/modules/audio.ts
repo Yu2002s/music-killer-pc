@@ -1,13 +1,12 @@
-import { LyricLine, parseLrc } from '@applemusic-like-lyrics/lyric'
 import { getMusicLyric } from '@renderer/api/lyric'
 import { getPlayInfo } from '@renderer/api/play'
 import { Music } from '@renderer/api/playlist/types'
-import lrcFile from '@renderer/assets/1.txt?raw'
 import icon from '@renderer/assets/electron.svg'
 import { addData, deleteData, getDataByKey, updateData } from '@renderer/db'
-import { Bridge, LoopMode, Quality, QualityItem, QualityType } from '@renderer/enums/music'
+import { Bridge, LoopMode, loopModeDict, qualityDict } from '@renderer/enums/music'
 import { StorageKey } from '@renderer/enums/storage'
 import { DBStoreName } from '@renderer/enums/store'
+import { getSavedDictValue, saveDictValue } from '@renderer/utils/dict'
 import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
 
@@ -52,32 +51,36 @@ export const useAudioStore = defineStore('audio', () => {
     isFavorite: false,
     updateTime: Date.now()
   })
-  const playlist = ref<Music[]>([])
+
+  // 音乐播放列表
+  const musicList = ref<Music[]>([])
 
   // 循环模式
-  const loopMode = ref<number>(
-    Number(localStorage.getItem(StorageKey.LOOP_MODE) || LoopMode.SEQUENCE)
+  const loopMode = ref<LoopMode>(
+    getSavedDictValue(loopModeDict, StorageKey.LOOP_MODE, LoopMode.SEQUENCE)
   )
   const progress = ref(0)
   const currentTime = ref(0)
   const isTrackProgress = ref(false)
   const isPlaying = ref(false)
   const volume = ref(audio.volume)
-  const lrcContent = ref<string>(lrcFile)
+  const lrcContent = ref<string>('')
 
-  const quality = ref(getSavedQuality())
+  // 音质
+  const quality = ref<Bridge>(getSavedDictValue(qualityDict, StorageKey.BRIDGE, Bridge.MP3))
+
   const currentIndex = computed({
     get() {
-      return playlist.value.findIndex((item) => item.id === music.value.id)
+      return musicList.value.findIndex((item) => item.id === music.value.id)
     },
     set(val) {
-      const length = playlist.value.length
+      const length = musicList.value.length
       if (!length || val === length || val < 0) {
         return
       }
-      if (music.value.id !== playlist.value[val].id) {
+      if (music.value.id !== musicList.value[val].id) {
         // 设置播放的音乐
-        music.value = playlist.value[val]
+        music.value = musicList.value[val]
       }
     }
   })
@@ -105,34 +108,29 @@ export const useAudioStore = defineStore('audio', () => {
   }
 
   watch(quality, async (value) => {
-    playForBridge(music.value.id, value.value)
+    playForBridge(music.value.id, value)
   })
 
   watch(music, async (value: Music) => {
-    playForBridge(value.id, quality.value.value)
+    playForBridge(value.id, quality.value)
     // console.log(lrcFile)
-    lrcContent.value = lrcFile
+    const lyricContent = await getMusicLyric(value.id)
     // 保存历史数据
     saveHistory(value)
   })
 
   function play(m: Music | undefined = undefined) {
     if (!m) {
-      // if (isPlaying.value) return
       audio.play()
       return
     }
 
-    const index = playlist.value.findIndex((item) => item.id === m.id)
+    const index = musicList.value.findIndex((item) => item.id === m.id)
     if (index !== -1) {
       music.value = m
       if (!isPlaying.value) {
         play()
       }
-      /*if (index !== 0) {
-        playlist.value.splice(index, 1)
-        playlist.value.unshift(m)
-      }*/
       return
     }
     // 不存在队列
@@ -154,9 +152,9 @@ export const useAudioStore = defineStore('audio', () => {
   function addPlay(m: Music, play: boolean = true) {
     if (play) {
       music.value = m
-      playlist.value.unshift(m)
+      musicList.value.unshift(m)
     } else {
-      playlist.value.push(m)
+      musicList.value.push(m)
     }
   }
 
@@ -166,7 +164,7 @@ export const useAudioStore = defineStore('audio', () => {
     const subCount = Math.min(20, length - start)
     const subList = list.slice(start, start + subCount)
     music.value = subList[0]
-    playlist.value.unshift(...subList)
+    musicList.value.unshift(...subList)
   }
 
   function setProgress(p: number) {
@@ -175,7 +173,7 @@ export const useAudioStore = defineStore('audio', () => {
   }
 
   function playRandom() {
-    const length = playlist.value.length
+    const length = musicList.value.length
     if (length === 0) return
     let index = getRandomNumber(0, length - 1)
     while (index === currentIndex.value) {
@@ -185,8 +183,11 @@ export const useAudioStore = defineStore('audio', () => {
     currentIndex.value = index
   }
 
+  /**
+   * 播放下一首
+   */
   function playNext() {
-    const length = playlist.value.length
+    const length = musicList.value.length
     if (length === 0) return
     if (loopMode.value == LoopMode.SEQUENCE) {
       // 顺序
@@ -202,7 +203,7 @@ export const useAudioStore = defineStore('audio', () => {
   }
 
   function playPrev() {
-    const length = playlist.value.length
+    const length = musicList.value.length
     if (loopMode.value == LoopMode.SEQUENCE) {
       if (currentIndex.value === 0) {
         currentIndex.value = length - 1
@@ -223,16 +224,16 @@ export const useAudioStore = defineStore('audio', () => {
   }
 
   function removeMusic(m: Music) {
-    playlist.value.splice(playlist.value.indexOf(m), 1)
+    musicList.value.splice(musicList.value.indexOf(m), 1)
   }
 
   function clearPlaylist() {
-    playlist.value = []
+    musicList.value = []
   }
 
   function setLoopMode(mode: LoopMode) {
     loopMode.value = mode
-    localStorage.setItem(StorageKey.LOOP_MODE, mode.toString())
+    saveDictValue(loopModeDict, StorageKey.LOOP_MODE, mode)
   }
 
   function favoriteMusic(m: Music, reverse: boolean = false) {
@@ -246,7 +247,7 @@ export const useAudioStore = defineStore('audio', () => {
       music.value.isFavorite = isFavorite
       return
     }
-    const existsMusic = playlist.value.find((item) => item.id === m.id)
+    const existsMusic = musicList.value.find((item) => item.id === m.id)
     if (existsMusic) {
       existsMusic.isFavorite = isFavorite
     }
@@ -261,16 +262,16 @@ export const useAudioStore = defineStore('audio', () => {
     audio.volume = val
   }
 
-  function setQuality(q: QualityItem) {
+  function setQuality(q: Bridge) {
     quality.value = q
-    localStorage.setItem(StorageKey.BRIDGE, q.value)
+    saveDictValue(qualityDict, StorageKey.BRIDGE, q)
   }
 
   return {
     currentIndex,
     audio,
     music,
-    playlist,
+    musicList,
     currentTime,
     progress,
     isPlaying,
@@ -298,20 +299,6 @@ export const useAudioStore = defineStore('audio', () => {
   }
 })
 
-function getSavedQuality(): QualityItem {
-  const savedQuality = localStorage.getItem(StorageKey.BRIDGE)
-  if (!savedQuality) {
-    return Quality.MP3
-  }
-  let quality = Quality.MP3
-  Object.entries(Quality).forEach(([k, v]) => {
-    if (v.value === savedQuality) {
-      quality = Quality[k]
-    }
-  })
-  return quality
-}
-
 /**
  * 保存历史数据
  * @param music 音乐对象
@@ -328,6 +315,12 @@ async function saveHistory(music: Music) {
   }
 }
 
+/**
+ * 获取指定范围的随机值
+ * @param min 最小值
+ * @param max 最大值
+ * @returns 返回范围随机值
+ */
 function getRandomNumber(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min
 }

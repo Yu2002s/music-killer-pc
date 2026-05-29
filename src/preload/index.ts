@@ -1,5 +1,5 @@
-import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
+import { contextBridge, ipcRenderer } from 'electron'
 import { Options, Response } from '../utils/request'
 
 // 是否显示错误提示
@@ -22,7 +22,7 @@ async function showErrorTips(msg: string) {
 const api = {
   /**
    * 发送一个请求
-   * @param options
+   * @param options 请求配置项
    */
   request: <T>(options: Options): Promise<T> => {
     let query = ''
@@ -44,6 +44,9 @@ const api = {
     return new Promise((resolve, reject) => {
       ;(ipcRenderer.invoke('request', options) as Promise<Response<T>>)
         .then((response) => {
+          if (options.raw) {
+            return resolve(response as T)
+          }
           if (response.code !== 200) {
             if (options.showErrorTips) {
               showErrorTips(response.msg)
