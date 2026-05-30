@@ -15,6 +15,7 @@ jobs:
 
     steps:
       - name: Clean up old releases
+        shell: bash  # 强制使用 bash
         env:
           GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         run: |
