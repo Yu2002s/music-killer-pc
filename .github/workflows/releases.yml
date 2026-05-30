@@ -14,21 +14,6 @@ jobs:
         os: [windows-latest]
 
     steps:
-      - name: Clean up old releases
-        shell: bash  # 强制使用 bash
-        env:
-          GH_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-        run: |
-          # 获取当前 tag
-          CURRENT_TAG=${GITHUB_REF#refs/tags/}
-          # 保留最近 5 个，排除当前
-          gh release list --limit 20 | grep -v "$CURRENT_TAG" | tail -n +6 | while read release; do
-            tag=$(echo $release | awk '{print $1}')
-            if [ -n "$tag" ]; then
-              echo "Deleting old release: $tag"
-              gh release delete $tag --yes
-            fi
-          done
       - name: Check out Git repository
         uses: actions/checkout@v3
 
