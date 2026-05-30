@@ -66,34 +66,5 @@
       "electron",
       "esbuild"
     ]
-  },
-  "build": {
-    "appId": "xyz.jdynb.music",
-    "productName": "MusicKiller",
-    "directories": {
-      "output": "dist"
-    },
-    "files": [
-      "build/**/*",
-      "node_modules/**/*",
-      "package.json"
-    ],
-    "mac": {
-      "target": [
-        "dmg",
-        "zip"
-      ],
-      "category": "public.app-category.utilities"
-    },
-    "win": {
-      "target": [
-        "nsis",
-        "portable"
-      ]
-    },
-    "publish": {
-      "provider": "generic",
-      "url": "https://your-server.com/updates"
-    }
   }
 }
