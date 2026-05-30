@@ -1,6 +1,7 @@
 import { electronAPI } from '@electron-toolkit/preload'
 import { contextBridge, ipcRenderer } from 'electron'
 import { Options, Response } from '../utils/request'
+import lyric from './lyric'
 
 // 是否显示错误提示
 let isShowErrorTips = false
@@ -44,7 +45,7 @@ const api = {
     return new Promise((resolve, reject) => {
       ;(ipcRenderer.invoke('request', options) as Promise<Response<T>>)
         .then((response) => {
-          if (options.raw) {
+          if (options.rawType) {
             return resolve(response as T)
           }
           if (response.code !== 200) {
@@ -65,6 +66,9 @@ const api = {
   },
   getWindowInfo: () => {
     return ipcRenderer.invoke('getWindowInfo')
+  },
+  music: {
+    ...lyric
   }
 }
 

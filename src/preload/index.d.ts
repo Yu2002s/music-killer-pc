@@ -24,6 +24,11 @@ declare global {
        * 获取窗口信息
        */
       getWindowInfo: () => Promise<WindowInfo>
+
+      music: {
+        buildParams: (musicId: number, isGetLyricx: boolean) => Promise<string>
+        decryptLyric: (lyricContent: ArrayBuffer, isGetLyricx: boolean) => Promise<string>
+      }
     }
   }
 }

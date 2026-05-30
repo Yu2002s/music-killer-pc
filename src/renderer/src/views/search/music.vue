@@ -17,7 +17,7 @@ import LoadingLayout from '@renderer/components/LoadingLayout.vue'
 import MusicList from '@renderer/components/MusicList.vue'
 import usePageRequest from '@renderer/composeable/usePageRequest'
 import { useSearchStore } from '@renderer/store/modules/search'
-import { watch } from 'vue'
+import { onBeforeRouteUpdate } from 'vue-router'
 
 const searchStore = useSearchStore()
 
@@ -38,13 +38,9 @@ const { pageNo, loading, error, total, data, refresh } = usePageRequest(
   }
 )
 
-watch(
-  () => searchStore.keyword,
-  (val) => {
-    console.log('search:', val)
-    refresh()
-  }
-)
+onBeforeRouteUpdate(() => {
+  refresh()
+})
 </script>
 
 <style scoped></style>

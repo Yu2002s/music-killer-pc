@@ -18,12 +18,12 @@ import VolumeBar from '@renderer/components/VolumeBar.vue'
 import { Bridge, LoopMode, loopModeDict, qualityDict } from '@renderer/enums/music'
 import { useAudioStore } from '@renderer/store/modules/audio'
 import { useLayoutStore } from '@renderer/store/modules/layout.js'
-import { getDictLabel } from '@renderer/utils/dict.js'
+import { getDictLabel } from '@renderer/utils/dict'
 import { formatDuration } from '@renderer/utils/time'
 import 'mdui/components/button'
 import 'mdui/components/button-icon.js'
 import 'mdui/components/slider.js'
-import { nextTick, onMounted, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import MenuPopup from './MenuPopup.vue'
 import PlayerView from './PlayerView.vue'
 
@@ -44,9 +44,7 @@ function onMouseDown() {
   audioStore.startTrackProgress()
 }
 
-async function onMouseUp(e: any) {
-  await nextTick()
-  console.log('onMouseUp', e.target.value)
+function onMouseUp(e: any) {
   audioStore.setProgress(e.target.value)
   audioStore.stopTrackProgress()
 }
@@ -74,7 +72,9 @@ function onLoopModeChange(e: LoopMode) {
       @click="layoutStore.isExpandBottomBar = !layoutStore.isExpandBottomBar"
     />
     <div class="music-info">
-      <router-link class="name" to="">{{ audioStore.music.name }}</router-link>
+      <router-link class="name" :to="`/search?q=${audioStore.music.name}`">{{
+        audioStore.music.name
+      }}</router-link>
       <div class="desc">
         <router-link class="artist" to="">{{ audioStore.music.artist }}</router-link>
         <span class="time"

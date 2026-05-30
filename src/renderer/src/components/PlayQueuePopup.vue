@@ -40,7 +40,9 @@ function clearAll() {
       >
         <img class="music-img" :src="item.pic" :alt="item.name" />
         <div class="music-info">
-          <router-link to="" class="music-name" :title="item.name">{{ item.name }}</router-link>
+          <router-link :to="`/search?q=${item.name}`" class="music-name" :title="item.name">{{
+            item.name
+          }}</router-link>
           <router-link to="" class="music-artist">{{ item.artist }}</router-link>
         </div>
         <mdui-button-icon

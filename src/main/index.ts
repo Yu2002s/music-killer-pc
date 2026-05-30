@@ -3,6 +3,10 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import request from '../utils/request'
+import { buildParams, decodeLyrics, convertKuwoLrc } from '../utils/lyric.js'
+import { updateElectronApp } from 'update-electron-app'
+
+updateElectronApp()
 
 function createWindow(): BrowserWindow {
   // 构建一个浏览器窗口
@@ -79,6 +83,15 @@ app.whenReady().then(() => {
       x: position[0],
       y: position[1]
     }
+  })
+
+  ipcMain.handle('music:buildParams', (_, musicId: number) => {
+    return buildParams(musicId, false)
+  })
+
+  ipcMain.handle('music:decryptLyric', async (_, content: ArrayBuffer) => {
+    const lyricContent = await decodeLyrics(Buffer.from(content), false)
+    return convertKuwoLrc(lyricContent)
   })
 
   app.on('activate', function () {

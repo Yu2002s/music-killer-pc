@@ -1,5 +1,5 @@
-appId: com.electron.app
-productName: music-killer-pc
+appId: xyz.jdynb.music
+productName: MusicKiller
 directories:
   buildResources: build
 files:

@@ -1,31 +1,52 @@
 <script setup lang="ts">
 import Material3Tab from '@renderer/components/Material3Tab.vue'
-import { ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed } from 'vue'
+import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router'
+import { useSearchStore } from '@renderer/store/modules/search'
 
+const route = useRoute()
 const router = useRouter()
-const currentTab = ref<number>(0)
+const searchStore = useSearchStore()
 
 const tabList = [
   {
     name: '单曲',
-    value: 0,
     path: '/search'
   },
   {
-    name: '专辑'
+    name: '专辑',
+    path: '/search/album'
   },
   {
     name: '歌单',
     path: '/search/playlist'
   },
   {
-    name: '歌手'
+    name: '歌手',
+    path: '/search/artist'
   }
 ]
 
-watch(currentTab, (val) => {
-  router.replace(tabList[val].path)
+const currentTab = computed({
+  get() {
+    return tabList.findIndex((tab) => tab.path === route.path)
+  },
+  set(val: number) {
+    router.replace({
+      path: tabList[val].path,
+      query: {
+        q: searchStore.keyword
+      }
+    })
+  }
+})
+
+if (route.query.q && route.query.q !== searchStore.keyword) {
+  searchStore.keyword = route.query.q as string
+}
+
+onBeforeRouteUpdate((to) => {
+  searchStore.keyword = to.query.q as string
 })
 </script>
 

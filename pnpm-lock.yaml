@@ -17,6 +17,9 @@ importers:
       electron-updater:
         specifier: ^6.3.9
         version: 6.8.3
+      update-electron-app:
+        specifier: ^3.2.0
+        version: 3.2.0
     devDependencies:
       '@applemusic-like-lyrics/lyric':
         specifier: ^1.0.1
@@ -54,6 +57,9 @@ importers:
       eslint-plugin-vue:
         specifier: ^10.6.2
         version: 10.9.1(@typescript-eslint/parser@8.59.4(eslint@9.39.4(jiti@2.7.0))(typescript@5.9.3))(eslint@9.39.4(jiti@2.7.0))(vue-eslint-parser@10.4.0(eslint@9.39.4(jiti@2.7.0)))
+      iconv-lite:
+        specifier: ^0.7.2
+        version: 0.7.2
       jss:
         specifier: ^10.10.0
         version: 10.10.0
@@ -63,6 +69,9 @@ importers:
       mdui:
         specifier: ^2.1.4
         version: 2.1.4
+      pako:
+        specifier: ^2.1.0
+        version: 2.1.0
       pinia:
         specifier: ^3.0.4
         version: 3.0.4(typescript@5.9.3)(vue@3.5.34(typescript@5.9.3))
@@ -1736,6 +1745,9 @@ packages:
     resolution: {integrity: sha512-nBF+F1rAZVCu/p7rjzgA+Yb4lfYXrpl7a6VmJrU8wF9I1CKvP/QwPNZHnOlwbTkY6dvtFIzFMSyQXbLoTQPRpA==}
     engines: {node: '>=8'}
 
+  github-url-to-object@4.0.6:
+    resolution: {integrity: sha512-NaqbYHMUAlPcmWFdrAB7bcxrNIiiJWJe8s/2+iOc9vlcHlwHqSGrPk+Yi3nu6ebTwgsZEa7igz+NH2vEq3gYwQ==}
+
   glob-parent@6.0.2:
     resolution: {integrity: sha512-XxwI8EOhVQgWp6iDL+3b0r86f4d6AX6zSU55HfB4ydCEuXLXc5FcYeOu+nnGftS4TEju/11rt4KJPTMgbfmv4A==}
     engines: {node: '>=10.13.0'}
@@ -1824,6 +1836,10 @@ packages:
     resolution: {integrity: sha512-4fCk79wshMdzMp2rH06qWrJE4iolqLhCUH+OiuIgU++RB0+94NlDL81atO7GX55uUKueo0txHNtvEyI6D7WdMw==}
     engines: {node: '>=0.10.0'}
 
+  iconv-lite@0.7.2:
+    resolution: {integrity: sha512-im9DjEDQ55s9fL4EYzOAv0yMqmMBSZp6G0VvFyTMPKWxiSBHUj9NW/qqLmXUwXrrM7AvqSlTCfvqRb0cM8yYqw==}
+    engines: {node: '>=0.10.0'}
+
   ieee754@1.2.1:
     resolution: {integrity: sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA==}
 
@@ -1870,6 +1886,9 @@ packages:
 
   is-promise@4.0.0:
     resolution: {integrity: sha512-hvpoI6korhJMnej285dSg6nu1+e6uxs7zG3BYAm5byqDsgJNWwxzM6z6iZiAgQR4TJ30JmBTOwqZUw3WlyH3AQ==}
+
+  is-url@1.2.4:
+    resolution: {integrity: sha512-ITvGim8FhRiYe4IQ5uHSkj7pVaPDrCTkNd3yq3cV7iZAcJdHTUMPMEHcqSOy9xZ9qFenQCvi+2wjH9a1nXqHww==}
 
   is-what@5.5.0:
     resolution: {integrity: sha512-oG7cgbmg5kLYae2N5IVd3jm2s+vldjxJzK1pcu9LfpGuQ93MQSzo0okvRna+7y5ifrD+20FE8FvjusyGaz14fw==}
@@ -2564,6 +2583,9 @@ packages:
     hasBin: true
     peerDependencies:
       browserslist: '>= 4.21.0'
+
+  update-electron-app@3.2.0:
+    resolution: {integrity: sha512-l2e7bzsW+rw70pfyyQeA9E/ofpNY2ZS99XuYxD2qWL4fEy3qMjpqwwgB0me7ESpGogIQE1CM0SaDvKGsK4Jg3Q==}
 
   uri-js@4.4.1:
     resolution: {integrity: sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==}
@@ -4488,6 +4510,10 @@ snapshots:
     dependencies:
       pump: 3.0.4
 
+  github-url-to-object@4.0.6:
+    dependencies:
+      is-url: 1.2.4
+
   glob-parent@6.0.2:
     dependencies:
       is-glob: 4.0.3
@@ -4595,6 +4621,10 @@ snapshots:
     dependencies:
       safer-buffer: 2.1.2
 
+  iconv-lite@0.7.2:
+    dependencies:
+      safer-buffer: 2.1.2
+
   ieee754@1.2.1:
     optional: true
 
@@ -4629,6 +4659,8 @@ snapshots:
   is-in-browser@1.1.3: {}
 
   is-promise@4.0.0: {}
+
+  is-url@1.2.4: {}
 
   is-what@5.5.0: {}
 
@@ -5357,6 +5389,11 @@ snapshots:
       browserslist: 4.28.2
       escalade: 3.2.0
       picocolors: 1.1.1
+
+  update-electron-app@3.2.0:
+    dependencies:
+      github-url-to-object: 4.0.6
+      ms: 2.1.3
 
   uri-js@4.4.1:
     dependencies:

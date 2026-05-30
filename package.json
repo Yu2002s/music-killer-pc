@@ -1,10 +1,14 @@
 {
   "name": "music-killer-pc",
   "version": "1.0.0",
-  "description": "An Electron application with Vue and TypeScript",
+  "description": "基于 Electron + Vue 开发桌面端音乐 App",
   "main": "./out/main/index.js",
-  "author": "example.com",
-  "homepage": "https://electron-vite.org",
+  "author": "yu2002s",
+  "homepage": "https://app.jdynb.xyz",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Yu2002s/music-killer-pc"
+  },
   "web-types": [
     "./node_modules/mdui/web-types.zh-cn.json"
   ],
@@ -26,7 +30,8 @@
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.2",
     "@electron-toolkit/utils": "^4.0.0",
-    "electron-updater": "^6.3.9"
+    "electron-updater": "^6.3.9",
+    "update-electron-app": "^3.2.0"
   },
   "devDependencies": {
     "@applemusic-like-lyrics/lyric": "^1.0.1",
@@ -41,9 +46,11 @@
     "electron-vite": "^5.0.0",
     "eslint": "^9.39.1",
     "eslint-plugin-vue": "^10.6.2",
+    "iconv-lite": "^0.7.2",
     "jss": "^10.10.0",
     "jss-preset-default": "^10.10.0",
     "mdui": "^2.1.4",
+    "pako": "^2.1.0",
     "pinia": "^3.0.4",
     "prettier": "^3.7.4",
     "sass": "^1.100.0",
@@ -59,5 +66,34 @@
       "electron",
       "esbuild"
     ]
+  },
+  "build": {
+    "appId": "xyz.jdynb.music",
+    "productName": "MusicKiller",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "build/**/*",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "category": "public.app-category.utilities"
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    },
+    "publish": {
+      "provider": "generic",
+      "url": "https://your-server.com/updates"
+    }
   }
 }

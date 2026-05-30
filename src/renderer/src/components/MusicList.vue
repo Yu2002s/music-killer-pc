@@ -65,8 +65,10 @@ function getMusicCover(item: Music): string {
     >
       <img class="music-img" :alt="item.name" :src="getMusicCover(item)" />
       <div class="music-info">
-        <router-link class="music-name" to="" :title="item.name">{{ item.name }}</router-link>
-        <router-link class="music-artist" to="">{{ item.artist }}</router-link>
+        <router-link class="music-name" :to="`/search?q=${item.name}`" :title="item.name">{{
+          item.name
+        }}</router-link>
+        <router-link to="" class="music-artist">{{ item.artist }}</router-link>
       </div>
       <div class="music-album">
         <router-link to="" class="album-text" :align="item.album">{{ item.album }}</router-link>

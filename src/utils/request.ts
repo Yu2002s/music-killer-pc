@@ -22,9 +22,9 @@ export interface Options {
    */
   showErrorTips?: boolean
   /**
-   * 返回原始报文
+   * 原始数据类型
    */
-  raw?: boolean
+  rawType?: 'string' | 'arraybuffer' | 'uintArray'
 }
 
 /**
@@ -45,7 +45,7 @@ export interface Response<T> {
 
 const BASE_URL = 'http://music.jdynb.xyz'
 
-export default async function request<R>(options: Options): Promise<Response<R>> {
+export default async function request(options: Options) {
   const { url, method = 'GET', data, header } = options
 
   let requestUrl = url
@@ -62,18 +62,14 @@ export default async function request<R>(options: Options): Promise<Response<R>>
       headers: header
     })
     .then(async (res) => {
-      if (options.raw) {
-        const text = await res.text()
-        return text
+      if (options.rawType) {
+        if (options.rawType === 'arraybuffer') {
+          return res.arrayBuffer()
+        } else if (options.rawType === 'uintArray') {
+          return res.bytes()
+        }
+        return res.text()
       }
       return res.json()
     })
-}
-
-request.get = function <R>(url: string, header: Record<string, string> | undefined = undefined) {
-  return request<R>({
-    method: 'GET',
-    url,
-    header
-  })
 }

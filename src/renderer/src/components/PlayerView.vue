@@ -2,7 +2,11 @@
   <Transition name="slide-bottom-top-fade">
     <div v-show="layoutStore.isExpandBottomBar" class="popup">
       <div class="player">
-        <img class="music-img" :src="getMusicCover(audioStore.music)" />
+        <img
+          class="music-img"
+          :src="getMusicCover(audioStore.music)"
+          :alt="audioStore.music.name"
+        />
         <div class="lyric-section">
           <div class="music-info">
             <div class="music-name">{{ audioStore.music.name }}</div>
@@ -30,7 +34,6 @@ import { Music } from '@renderer/api/playlist/types'
 import { useAudioStore } from '@renderer/store/modules/audio'
 import { useLayoutStore } from '@renderer/store/modules/layout'
 import 'mdui/components/button'
-import { onMounted, ref, toRaw } from 'vue'
 import LyricView from './LyricView.vue'
 
 const layoutStore = useLayoutStore()

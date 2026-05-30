@@ -25,9 +25,7 @@ import { useSearchStore } from './store/modules/search.js'
 const router = useRouter()
 const route = useRoute()
 const isUpdate = ref(true)
-const keyword = ref('')
 const searchStore = useSearchStore()
-const layoutStore = useLayoutStore()
 
 const menuList = routes
   .filter((item) => item.meta?.home)
@@ -77,15 +75,13 @@ function navigateToSetting() {
 }
 
 function onSearchSubmit(e: string) {
-  console.log('onSearchSubmit')
-  searchStore.keyword = e
-  if (route.path.startsWith('/search')) {
-    return
-  }
-  console.log('push')
+  console.log('onSearchSubmit:', e)
   // 搜索
   router.push({
-    path: '/search'
+    path: `/search`,
+    query: {
+      q: e
+    }
   })
 }
 </script>
@@ -127,7 +123,11 @@ function onSearchSubmit(e: string) {
       <mdui-top-app-bar-title>{{ route.meta.title }}</mdui-top-app-bar-title>
       <div style="flex-grow: 1"></div>
       <div class="header-right">
-        <search-bar v-model="keyword" style="margin-right: 10px" @on-submit="onSearchSubmit" />
+        <search-bar
+          v-model="searchStore.keyword"
+          style="margin-right: 10px"
+          @on-submit="onSearchSubmit"
+        />
         <mdui-button-icon @click="refresh">
           <mdui-icon-refresh></mdui-icon-refresh>
         </mdui-button-icon>

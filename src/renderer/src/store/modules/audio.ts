@@ -59,16 +59,23 @@ export const useAudioStore = defineStore('audio', () => {
   const loopMode = ref<LoopMode>(
     getSavedDictValue(loopModeDict, StorageKey.LOOP_MODE, LoopMode.SEQUENCE)
   )
+  // 进度条进度
   const progress = ref(0)
+  // 当前播放时间
   const currentTime = ref(0)
+  // 是否正在修改进度
   const isTrackProgress = ref(false)
+  // 是否正在播放
   const isPlaying = ref(false)
+  // 音量
   const volume = ref(audio.volume)
+  // 歌词内容
   const lrcContent = ref<string>('')
 
   // 音质
   const quality = ref<Bridge>(getSavedDictValue(qualityDict, StorageKey.BRIDGE, Bridge.MP3))
 
+  // 单曲播放歌曲的索引位置
   const currentIndex = computed({
     get() {
       return musicList.value.findIndex((item) => item.id === music.value.id)
@@ -107,18 +114,25 @@ export const useAudioStore = defineStore('audio', () => {
     }
   }
 
-  watch(quality, async (value) => {
+  // 监听音质改变
+  watch(quality, (value) => {
     playForBridge(music.value.id, value)
   })
 
+  // 监听音乐切换
   watch(music, async (value: Music) => {
     playForBridge(value.id, quality.value)
-    // console.log(lrcFile)
-    const lyricContent = await getMusicLyric(value.id)
     // 保存历史数据
     saveHistory(value)
+    const lyricContent = await getMusicLyric(value.id)
+    const decryptedLyricContent = await window.api.music.decryptLyric(lyricContent, false)
+    lrcContent.value = decryptedLyricContent
   })
 
+  /**
+   * 播放音乐
+   * @param m 音乐对象
+   */
   function play(m: Music | undefined = undefined) {
     if (!m) {
       audio.play()
@@ -137,10 +151,16 @@ export const useAudioStore = defineStore('audio', () => {
     addPlay(m)
   }
 
+  /**
+   * 暂停
+   */
   function pause() {
     audio.pause()
   }
 
+  /**
+   * 播放或暂停
+   */
   function playOrPause() {
     if (isPlaying.value) {
       pause()
@@ -149,6 +169,11 @@ export const useAudioStore = defineStore('audio', () => {
     }
   }
 
+  /**
+   * 添加到播放队列
+   * @param m 音乐对象
+   * @param play 是否立即播放
+   */
   function addPlay(m: Music, play: boolean = true) {
     if (play) {
       music.value = m
@@ -158,6 +183,11 @@ export const useAudioStore = defineStore('audio', () => {
     }
   }
 
+  /**
+   * 添加播放列表到播放队列
+   * @param list 音乐列表
+   * @param start 开始位置
+   */
   function addPlaylist(list: Music[], start: number = 0) {
     const length = list.length
     if (length === 0) return
@@ -167,11 +197,18 @@ export const useAudioStore = defineStore('audio', () => {
     musicList.value.unshift(...subList)
   }
 
+  /**
+   * 设置进度
+   * @param p 秒
+   */
   function setProgress(p: number) {
     progress.value = p
     audio.currentTime = p
   }
 
+  /**
+   * 随机播放
+   */
   function playRandom() {
     const length = musicList.value.length
     if (length === 0) return
@@ -199,9 +236,14 @@ export const useAudioStore = defineStore('audio', () => {
       }
     } else if (loopMode.value == LoopMode.SHUFFLE) {
       playRandom()
+    } else {
+      // loop 单曲循环
     }
   }
 
+  /**
+   * 播放上一首
+   */
   function playPrev() {
     const length = musicList.value.length
     if (loopMode.value == LoopMode.SEQUENCE) {
@@ -215,27 +257,50 @@ export const useAudioStore = defineStore('audio', () => {
     }
   }
 
+  /**
+   * 开始调整进度
+   */
   function startTrackProgress() {
     isTrackProgress.value = true
   }
 
+  /**
+   * 停止调整进度
+   */
   function stopTrackProgress() {
     isTrackProgress.value = false
   }
 
+  /**
+   * 从播放队列删除指定音乐
+   * @param m 音乐对象
+   */
   function removeMusic(m: Music) {
     musicList.value.splice(musicList.value.indexOf(m), 1)
   }
 
+  /**
+   * 清除播放列表
+   */
   function clearPlaylist() {
     musicList.value = []
   }
 
+  /**
+   * 设置循环播放模式
+   * @param mode 模式
+   * @see LoopMode
+   */
   function setLoopMode(mode: LoopMode) {
     loopMode.value = mode
     saveDictValue(loopModeDict, StorageKey.LOOP_MODE, mode)
   }
 
+  /**
+   * 收藏音乐
+   * @param m 音乐对象
+   * @param reverse 状态反转
+   */
   function favoriteMusic(m: Music, reverse: boolean = false) {
     const isFavorite = reverse ? !m.isFavorite : m.isFavorite
     if (isFavorite) {
@@ -253,15 +318,27 @@ export const useAudioStore = defineStore('audio', () => {
     }
   }
 
+  /**
+   * 是否收藏
+   * @param m 音乐对象
+   */
   async function isFavorite(m: Music) {
     return !!(await getDataByKey<Music>(DBStoreName.FAVORITE, m.id))
   }
 
+  /**
+   * 设置音量
+   * @param val 音量（1-100)
+   */
   function setVolume(val: number) {
     volume.value = val
     audio.volume = val
   }
 
+  /**
+   * 设置音质
+   * @param q 音质等级
+   */
   function setQuality(q: Bridge) {
     quality.value = q
     saveDictValue(qualityDict, StorageKey.BRIDGE, q)

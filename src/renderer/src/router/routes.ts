@@ -80,6 +80,14 @@ export default [
       {
         path: 'playlist',
         component: () => import('@renderer/views/search/playlist.vue')
+      },
+      {
+        path: 'album',
+        component: () => import('@renderer/views/search/album.vue')
+      },
+      {
+        path: 'artist',
+        component: () => import('@renderer/views/search/artist.vue')
       }
     ]
   },
