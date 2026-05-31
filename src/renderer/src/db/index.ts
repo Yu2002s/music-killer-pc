@@ -19,6 +19,24 @@ function UPGRADE_0_1(db: IDBDatabase) {
   })
 }
 
+function UPGRADE_1_2(transaction: IDBTransaction) {
+  const store1 = transaction.objectStore(DBStoreName.HISTORY)
+  store1.createIndex('updateTime', 'updateTime')
+
+  const store2 = transaction.objectStore(DBStoreName.FAVORITE)
+  store2.createIndex('updateTime', 'updateTime')
+}
+
+function UPGRADE_2_3(db: IDBDatabase) {
+  const store = db.createObjectStore(DBStoreName.SEARCH_HISTORY, {
+    keyPath: 'name'
+  })
+  store.createIndex('name', 'name', {
+    unique: false
+  })
+  store.createIndex('updateTime', 'updateTime')
+}
+
 export function openDB() {
   let _db: IDBDatabase | null = null
 
@@ -26,7 +44,7 @@ export function openDB() {
     if (_db !== null) return Promise.resolve(_db)
 
     return new Promise((resolve, reject) => {
-      const request = window.indexedDB.open('music', 1)
+      const request = window.indexedDB.open('music', 3)
       let isShowError = false
       request.onerror = () => {
         console.error('数据库连接失败')
@@ -60,7 +78,10 @@ export function openDB() {
               UPGRADE_0_1(db)
               break
             case 2:
-              // UPGRADE_1_2(db)
+              UPGRADE_1_2((event.target as any).transaction as IDBTransaction)
+              break
+            case 3:
+              UPGRADE_2_3(db)
               break
           }
         }
@@ -138,10 +159,12 @@ export async function deleteData(storeName: string, key: any) {
   })
 }
 
-interface QueryPageParams {
+interface QueryPageParams<T = any> {
   storeName: string
   pageNo?: number
   pageSize?: number
+  indexName?: keyof T
+  direction?: 'next' | 'nextunique' | 'prev' | 'prevunique'
 }
 
 export async function getDataCount(storeName: string): Promise<number> {
@@ -159,11 +182,22 @@ export async function getDataCount(storeName: string): Promise<number> {
   })
 }
 
-export async function getPageData<T>(params: QueryPageParams) {
+/**
+ * 获取分页数据
+ * @param params 查询参数
+ */
+export async function getPageData<T>(params: QueryPageParams<T>) {
   const { storeName, pageNo = 1, pageSize = 20 } = params
   const db = await openDB()()
   return new Promise<T[]>((resolve, reject) => {
-    const request = db.transaction([storeName], 'readwrite').objectStore(storeName).openCursor()
+    const store = db.transaction([storeName], 'readwrite').objectStore(storeName)
+
+    let request: IDBRequest<IDBCursorWithValue>
+    if (params.indexName) {
+      request = store.index(params.indexName as string).openCursor(null, params.direction || 'prev')
+    } else {
+      request = store.openCursor()
+    }
 
     let skip = true
     let count = 0

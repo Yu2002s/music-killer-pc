@@ -7,6 +7,8 @@ interface Options {
     pageSize: number
   }
   immediate?: boolean
+  indexName?: string
+  direction?: 'next' | 'nextunique' | 'prev' | 'prevunique'
 }
 
 export function useQueryDB<T>(
@@ -16,7 +18,8 @@ export function useQueryDB<T>(
       pageNo: 1,
       pageSize: 20
     },
-    immediate: true
+    immediate: true,
+    indexName: 'updateTime'
   }
 ) {
   const loading = ref<boolean>(false)
@@ -36,7 +39,9 @@ export function useQueryDB<T>(
       const list = await getPageData<T>({
         storeName,
         pageNo: pageNo.value,
-        pageSize: pageSize.value
+        pageSize: pageSize.value,
+        indexName: options.indexName,
+        direction: options.direction
       })
       if (pageNo.value === 1) {
         data.value = list
@@ -46,6 +51,7 @@ export function useQueryDB<T>(
         // @ts-ignore
         data.value.push(...list)
       }
+      console.log(total.value, data.value)
     } catch (e: any) {
       error.value = e
     } finally {

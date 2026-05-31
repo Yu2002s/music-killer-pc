@@ -1,4 +1,5 @@
 export enum DBStoreName {
   FAVORITE = 'favorite',
-  HISTORY = 'history'
+  HISTORY = 'history',
+  SEARCH_HISTORY = 'searchHistory'
 }

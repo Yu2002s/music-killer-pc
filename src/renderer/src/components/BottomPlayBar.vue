@@ -44,8 +44,11 @@ function onMouseDown() {
   audioStore.startTrackProgress()
 }
 
-function onMouseUp(e: any) {
+function onProgressChange(e: any) {
   audioStore.setProgress(e.target.value)
+}
+
+function onMouseUp() {
   audioStore.stopTrackProgress()
 }
 
@@ -161,8 +164,9 @@ function onLoopModeChange(e: LoopMode) {
         :value="audioStore.progress"
         :max="audioStore.music.duration"
         step="1"
-        @change="onMouseUp"
-        @focus="onMouseDown"
+        @change="onProgressChange"
+        @mousedown="onMouseDown"
+        @mouseup="onMouseUp"
       ></mdui-slider>
     </div>
 

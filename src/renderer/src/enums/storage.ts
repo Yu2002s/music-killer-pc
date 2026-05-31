@@ -1,4 +1,5 @@
 export enum StorageKey {
   LOOP_MODE = 'loopMode',
-  BRIDGE = 'bridge'
+  BRIDGE = 'bridge',
+  AUTO_PLAY = 'autoPlay'
 }

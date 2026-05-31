@@ -9,6 +9,7 @@ import handleMusicIPC from './ipc/music'
 function createWindow(): BrowserWindow {
   // 构建一个浏览器窗口
   const mainWindow = new BrowserWindow({
+    title: 'MusicKiller',
     width: 900,
     height: 670,
     minWidth: 600,

@@ -23,6 +23,7 @@ const { loading, error, data, send } = useRequest(
     })
   },
   {
+    immediate: true,
     onSuccess: (data) => {
       if (pageNo.value === 1) {
         musicData.value = data.musicList || []
@@ -34,19 +35,21 @@ const { loading, error, data, send } = useRequest(
   }
 )
 
-onMounted(() => {
+function onLoadMore() {
+  pageNo.value++
   send()
-})
+}
 </script>
 
 <template>
   <loading-layout
-    v-model="pageNo"
+    :model-value="pageNo"
     :loading="loading"
     :total="total"
     :item-count="musicData.length"
     :error="error"
     enable-load-more
+    @load-more="onLoadMore"
   >
     <music-list v-if="data" :list="musicData" />
   </loading-layout>

@@ -3,13 +3,13 @@
     <ul ref="container" class="lyric-list" @scroll="onScroll" @scrollend="onScrollEnd">
       <li style="height: 300px"></li>
       <li
-        v-for="item in lyric"
-        :key="item.startTime"
+        v-for="(item, index) in lyric"
+        :key="index"
         class="lyric-item"
         :class="{ active: isActive(item) }"
         @click="selectItem(item.startTime)"
       >
-        <span v-for="word in item.words" :key="word.startTime">{{ word.word }}</span>
+        <span v-for="word in item.words" :key="String(word.startTime) + word">{{ word.word }}</span>
         <div v-if="item.translatedLyric" class="translate">{{ item.translatedLyric }}</div>
       </li>
       <li style="height: 300px"></li>
@@ -18,8 +18,8 @@
 </template>
 
 <script setup lang="ts">
-import { LyricLine, parseLrc } from '@applemusic-like-lyrics/lyric';
-import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue';
+import { LyricLine, parseLrc } from '@applemusic-like-lyrics/lyric'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 
 interface Props {
   lyricContent: string
@@ -51,7 +51,7 @@ watch(
     // 计算歌词居中的位置
     const activeLi = container.value.getElementsByClassName('active')
     if (activeLi.length) {
-      console.log(activeLi[0])
+      // console.log((activeLi[0] as HTMLLIElement).offsetTop - 300)
       container.value.scrollTop = (activeLi[0] as HTMLLIElement).offsetTop - 300
     }
   },

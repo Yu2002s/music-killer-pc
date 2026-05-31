@@ -2,13 +2,15 @@ import { getMusicLyric } from '@renderer/api/lyric'
 import { getPlayInfo } from '@renderer/api/play'
 import { Music } from '@renderer/api/playlist/types'
 import icon from '@renderer/assets/electron.svg'
-import { addData, deleteData, getDataByKey, updateData } from '@renderer/db'
+import { addData, deleteData, getDataByKey, getPageData, updateData } from '@renderer/db'
 import { Bridge, LoopMode, loopModeDict, qualityDict } from '@renderer/enums/music'
 import { StorageKey } from '@renderer/enums/storage'
 import { DBStoreName } from '@renderer/enums/store'
 import { getSavedDictValue, saveDictValue } from '@renderer/utils/dict'
 import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
+import { statusDict } from '@renderer/dict/common'
+import { Status } from '@renderer/enums/common'
 
 export const useAudioStore = defineStore('audio', () => {
   const audio = new Audio()
@@ -28,6 +30,7 @@ export const useAudioStore = defineStore('audio', () => {
   })
 
   audio.addEventListener('timeupdate', (e: any) => {
+    // console.log('timeupdate', e.target.currentTime)
     if (isTrackProgress.value) {
       return
     }
@@ -51,6 +54,24 @@ export const useAudioStore = defineStore('audio', () => {
     isFavorite: false,
     updateTime: Date.now()
   })
+
+  ;(async function getHistoryMusic() {
+    const result = await getPageData<Music>({
+      pageNo: 1,
+      pageSize: 20,
+      storeName: DBStoreName.HISTORY,
+      indexName: 'updateTime'
+    })
+    if (result.length > 0) {
+      const status = getSavedDictValue(statusDict, StorageKey.AUTO_PLAY, Status.DISABLED)
+      if (status === Status.ENABLED) {
+        music.value = result[0]
+        addPlaylist(result)
+      } else {
+        Object.assign(music.value, result[0])
+      }
+    }
+  })()
 
   // 音乐播放列表
   const musicList = ref<Music[]>([])
@@ -238,6 +259,7 @@ export const useAudioStore = defineStore('audio', () => {
       playRandom()
     } else {
       // loop 单曲循环
+      setProgress(0)
     }
   }
 
@@ -254,6 +276,8 @@ export const useAudioStore = defineStore('audio', () => {
       }
     } else if (loopMode.value == LoopMode.SHUFFLE) {
       playRandom()
+    } else {
+      setProgress(0)
     }
   }
 
