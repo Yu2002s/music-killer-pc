@@ -1,4 +1,4 @@
-import { net } from 'electron'
+import { IpcMain, net } from 'electron'
 
 export interface Options {
   /**
@@ -45,7 +45,18 @@ export interface Response<T> {
 
 const BASE_URL = 'http://music.jdynb.xyz'
 
-export default async function request(options: Options) {
+/**
+ * 处理请求相关的ipc通信
+ * @param ipcMain ipcMain
+ */
+export function handleRequestIPC(ipcMain: IpcMain) {
+  ipcMain.handle('request', (_, options) => {
+    console.log('request', options)
+    return request(options)
+  })
+}
+
+export async function request(options: Options) {
   const { url, method = 'GET', data, header } = options
 
   let requestUrl = url

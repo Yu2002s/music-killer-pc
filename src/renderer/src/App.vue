@@ -16,15 +16,16 @@ import 'mdui/components/top-app-bar-title.js'
 import 'mdui/components/top-app-bar.js'
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import PlayerView from './components/PlayerView.vue'
-import PopupWindow from './components/PopupWindow.vue'
 import SearchBar from './components/SearchBar.vue'
-import { useLayoutStore } from './store/modules/layout.js'
 import { useSearchStore } from './store/modules/search.js'
+import { UpdateInfo } from 'electron-updater'
+import UpdateDialog from '@renderer/components/UpdateDialog.vue'
 
 const router = useRouter()
 const route = useRoute()
 const isUpdate = ref(true)
+const downloadProgress = ref(-1)
+const updateInfo = ref<UpdateInfo | null>(null)
 const searchStore = useSearchStore()
 
 const menuList = routes
@@ -40,6 +41,16 @@ const menuList = routes
 
 onMounted(() => {
   router.push('/')
+
+  window.api.update.onUpdateAvailable((info) => {
+    console.log('updateAvailable:', info)
+    updateInfo.value = info
+  })
+
+  window.api.update.onDownloadProgress((progress) => {
+    console.log('downloadProgress:', progress)
+    downloadProgress.value = progress.percent
+  })
 })
 
 function onMenuItemClick(item: any): void {
@@ -83,6 +94,10 @@ function onSearchSubmit(e: string) {
       q: e
     }
   })
+}
+
+function onUpdate() {
+  window.api.update.startDownloadUpdate()
 }
 </script>
 
@@ -148,6 +163,12 @@ function onSearchSubmit(e: string) {
     <mdui-bottom-app-bar style="left: 82px">
       <bottom-play-bar></bottom-play-bar>
     </mdui-bottom-app-bar>
+
+    <update-dialog
+      :download-progress="downloadProgress"
+      :update-info="updateInfo"
+      @on-update="onUpdate"
+    />
   </div>
 </template>
 

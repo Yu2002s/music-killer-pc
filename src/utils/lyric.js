@@ -43,7 +43,6 @@ export function buildParams(musicId, isGetLyricx) {
 export async function decodeLyrics(buf, isGetLyricx) {
   // 检查内容格式
   const header = buf.slice(0, Math.min(10, buf.length)).toString('utf8')
-  console.log(header)
   if (!header.startsWith('tp=content')) {
     return ''
   }

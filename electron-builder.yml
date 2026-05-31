@@ -38,8 +38,11 @@ linux:
 appImage:
   artifactName: ${name}-${version}.${ext}
 npmRebuild: false
+# 发布更新
 publish:
-  provider: generic
-  url: https://example.com/auto-updates
+  - provider: github # 使用github
+    owner: Yu2002s # 用户名
+    repo: music-killer-pc # 仓库名
+    private: false # 是否私有
 electronDownload:
   mirror: https://mirrors.huaweicloud.com/electron/

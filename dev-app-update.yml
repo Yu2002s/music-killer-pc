@@ -1,3 +1,21 @@
-provider: generic
-url: https://example.com/auto-updates
-updaterCacheDirName: music-killer-pc-updater
+# 更新服务器的提供商，使用 GitHub 必须设为 'github'
+provider: "github"
+
+# 必填: GitHub 仓库的拥有者（用户名或组织名）
+# 请将 'your-username' 替换为你的实际 GitHub 用户名
+owner: "yu2002s"
+
+# 必填: 仓库名称
+# 请将 'your-repo-name' 替换为你的实际仓库名
+repo: "music-killer-pc"
+
+# 可选: 如果你的仓库是私有的，需要提供 GitHub 访问令牌
+# 建议使用环境变量，不要直接写在文件中
+# token: "ghp_xxxxxxxxxxxx"
+
+# 可选: 是否使用 v 前缀的 Git Tag（例如 v1.0.0），默认为 true
+# vPrefixedTagName: true
+
+# 可选: 指定更新渠道，默认为 'latest'
+# 如果你在 GitHub Releases 中使用了预发布版本，可能需要设置
+# channel: "latest"

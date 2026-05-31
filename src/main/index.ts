@@ -1,12 +1,10 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, globalShortcut } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import request from '../utils/request'
-import { buildParams, decodeLyrics, convertKuwoLrc } from '../utils/lyric.js'
-import { updateElectronApp } from 'update-electron-app'
-
-updateElectronApp()
+import { handleRequestIPC } from '../utils/request'
+import { checkUpdate } from '../utils/update'
+import handleMusicIPC from './ipc/music'
 
 function createWindow(): BrowserWindow {
   // 构建一个浏览器窗口
@@ -64,41 +62,20 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  // IPC test
-  ipcMain.on('ping', () => console.log('pong'))
-
-  ipcMain.handle('request', (_, options) => {
-    console.log('request', options)
-    return request(options)
-  })
-
   const mainWindow = createWindow()
-
-  ipcMain.handle('getWindowInfo', () => {
-    const size = mainWindow.getSize()
-    const position = mainWindow.getPosition()
-    return {
-      width: size[0],
-      height: size[1],
-      x: position[0],
-      y: position[1]
-    }
-  })
-
-  ipcMain.handle('music:buildParams', (_, musicId: number) => {
-    return buildParams(musicId, false)
-  })
-
-  ipcMain.handle('music:decryptLyric', async (_, content: ArrayBuffer) => {
-    const lyricContent = await decodeLyrics(Buffer.from(content), false)
-    return convertKuwoLrc(lyricContent)
-  })
 
   app.on('activate', function () {
     // 在macOS上，当activate时，在应用中重新创建一个窗口是很常见的
     // 点击了Dock图标，且没有其他窗口处于打开状态。
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
+
+  // 注册热键
+  registerShortcuts(mainWindow)
+  // 处理ipc通信
+  handleIPCs()
+  // 检查更新
+  checkUpdate(mainWindow)
 })
 
 // 当所有窗口都关闭时退出程序，macOS 平台除外。在 macOS 上，这是常见的做法
@@ -108,6 +85,29 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit()
   }
+  globalShortcut.unregisterAll()
 })
 
-// 在此文件中，您可以包含应用程序其余特定的主进程代码。您也可以将它们放在单独的文件中，并在此处引入它们。
+/**
+ * 处理所有的ipc通信
+ */
+function handleIPCs() {
+  // 通信管理
+  handleRequestIPC(ipcMain) // 请求相关
+  handleMusicIPC(ipcMain) // 音乐相关
+}
+
+/**
+ * 注册热键
+ * @param mainWindow 主窗口
+ */
+function registerShortcuts(mainWindow: BrowserWindow) {
+  // 注册
+  globalShortcut.register('CommandOrControl+Alt+Up', () => {
+    if (mainWindow.isFocused()) {
+      mainWindow.webContents.openDevTools({
+        mode: 'detach'
+      })
+    }
+  })
+}
