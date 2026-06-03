@@ -8,6 +8,8 @@ on:
 jobs:
   release:
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: write  # 写入权限
 
     strategy:
       matrix:
@@ -38,7 +40,7 @@ jobs:
         run: npm run build:win
 
       - name: release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           draft: true
           files: |
@@ -54,3 +56,4 @@ jobs:
             dist/*.blockmap
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
