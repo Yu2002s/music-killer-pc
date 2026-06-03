@@ -107,5 +107,43 @@ export default [
     meta: {
       title: '歌单详情'
     }
+  },
+  {
+    path: '/playlist/tag/:id',
+    component: () => import('@renderer/views/playlist/tag.vue'),
+    meta: {
+      title: '歌单分类'
+    }
+  },
+  {
+    path: '/rank/list',
+    component: () => import('@renderer/views/rank/list.vue'),
+    meta: {
+      title: '排行榜歌曲'
+    }
+  },
+  {
+    path: '/artist/detail',
+    component: () => import('@renderer/views/artist/detail.vue'),
+    meta: {
+      title: '歌手详情'
+    },
+    children: [
+      {
+        path: '',
+        component: () => import('@renderer/views/artist/music.vue')
+      },
+      {
+        path: 'album',
+        component: () => import('@renderer/views/artist/album.vue')
+      }
+    ]
+  },
+  {
+    path: '/album/:id',
+    component: () => import('@renderer/views/album/index.vue'),
+    meta: {
+      title: '专辑歌曲'
+    }
   }
 ] as readonly RouteRecordRaw[]

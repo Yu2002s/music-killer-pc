@@ -4,10 +4,25 @@ import { computed } from 'vue'
 import LoadMore from './LoadMore.vue'
 
 interface Props {
+  /**
+   * 加载状态
+   */
   loading?: boolean
+  /**
+   * 错误
+   */
   error?: string | Error
+  /**
+   * 是否开启加载更多
+   */
   enableLoadMore?: boolean
+  /**
+   * 总数据数
+   */
   total?: number
+  /**
+   * 实际展示在页面的数据数
+   */
   itemCount?: number
 }
 
@@ -21,6 +36,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits(['load-more', 'refresh'])
 
+// 页码
 const pageNo = defineModel({
   type: Number,
   default: 1

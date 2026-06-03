@@ -20,6 +20,7 @@ import SearchBar from './components/SearchBar.vue'
 import { useSearchStore } from './store/modules/search.js'
 import { UpdateInfo } from 'electron-updater'
 import UpdateDialog from '@renderer/components/UpdateDialog.vue'
+import { useLayoutStore } from '@renderer/store/modules/layout'
 
 const router = useRouter()
 const route = useRoute()
@@ -27,15 +28,17 @@ const isUpdate = ref(true)
 const downloadProgress = ref(-1)
 const updateInfo = ref<UpdateInfo | null>(null)
 const searchStore = useSearchStore()
+const layoutStore = useLayoutStore()
 
 const menuList = routes
   .filter((item) => item.meta?.home)
   .map((item) => {
     return {
       icon: item.meta?.icon,
-      name: item.meta?.title,
+      title: item.meta?.title,
       path: item.path,
-      children: item.children
+      children: item.children,
+      name: item.name
     }
   })
 
@@ -58,7 +61,7 @@ function onMenuItemClick(item: any): void {
 }
 
 function back(): void {
-  if (routes.some((item) => item.path === route.path)) {
+  if (menuList.some((item) => item.name === route.name)) {
     router.replace('/')
     return
   }
@@ -102,34 +105,35 @@ function onUpdate() {
 </script>
 
 <template>
-  <mdui-navigation-rail divider alignment="center" :value="route.path">
-    <mdui-button-icon
-      slot="top"
-      :variant="route.path === '/search' ? 'filled' : 'outline'"
-      @click="navigateToSearch"
-    >
-      <mdui-icon-search></mdui-icon-search>
-    </mdui-button-icon>
-    <mdui-button-icon
-      slot="bottom"
-      :variant="route.path === '/setting' ? 'filled' : 'outline'"
-      @click="navigateToSetting"
-    >
-      <mdui-icon-settings></mdui-icon-settings>
-    </mdui-button-icon>
-    <mdui-navigation-rail-item
-      v-for="item in menuList"
-      :key="item.path"
-      :value="item.path"
-      @click="onMenuItemClick(item)"
-    >
-      <span>
-        {{ item.name }}
-      </span>
-      <component :is="`mdui-icon-` + item.icon" slot="icon" />
-    </mdui-navigation-rail-item>
-  </mdui-navigation-rail>
-
+  <div class="slidebar" :class="{ collapsed: layoutStore.isExpandBottomBar }">
+    <mdui-navigation-rail divider alignment="center" :value="route.path">
+      <mdui-button-icon
+        slot="top"
+        :variant="route.path === '/search' ? 'filled' : 'outline'"
+        @click="navigateToSearch"
+      >
+        <mdui-icon-search></mdui-icon-search>
+      </mdui-button-icon>
+      <mdui-button-icon
+        slot="bottom"
+        :variant="route.path === '/setting' ? 'filled' : 'outline'"
+        @click="navigateToSetting"
+      >
+        <mdui-icon-settings></mdui-icon-settings>
+      </mdui-button-icon>
+      <mdui-navigation-rail-item
+        v-for="item in menuList"
+        :key="item.path"
+        :value="item.path"
+        @click="onMenuItemClick(item)"
+      >
+        <span>
+          {{ item.title }}
+        </span>
+        <component :is="`mdui-icon-` + item.icon" slot="icon" />
+      </mdui-navigation-rail-item>
+    </mdui-navigation-rail>
+  </div>
   <div class="main">
     <mdui-top-app-bar v-if="!route.meta.hiddenHeader" variant="small" style="left: 82px">
       <mdui-button-icon v-if="!isHome" @click="back">
@@ -160,7 +164,9 @@ function onUpdate() {
         <mdui-circular-progress></mdui-circular-progress>
       </div>
     </div>
-    <mdui-bottom-app-bar style="left: 82px">
+    <mdui-bottom-app-bar
+      :style="{ transition: '0.3s linear', left: layoutStore.isExpandBottomBar ? 0 : '82px' }"
+    >
       <bottom-play-bar></bottom-play-bar>
     </mdui-bottom-app-bar>
 
@@ -173,6 +179,16 @@ function onUpdate() {
 </template>
 
 <style lang="scss">
+.slidebar {
+  width: 78px;
+  overflow: hidden;
+  position: relative;
+
+  &.collapsed {
+    display: none;
+  }
+}
+
 .main {
   overflow: hidden;
 

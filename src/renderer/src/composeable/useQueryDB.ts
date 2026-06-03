@@ -1,25 +1,25 @@
-import { onMounted, ref, watch } from 'vue'
 import { getDataCount, getPageData } from '@renderer/db'
+import { onMounted, ref, watch } from 'vue'
 
-interface Options {
+interface Options<T> {
   initPage?: {
     pageNo: number
     pageSize: number
   }
   immediate?: boolean
-  indexName?: string
+  indexName?: keyof T
   direction?: 'next' | 'nextunique' | 'prev' | 'prevunique'
 }
 
 export function useQueryDB<T>(
   storeName: string,
-  options: Options = {
+  options: Options<T> = {
     initPage: {
       pageNo: 1,
       pageSize: 20
     },
     immediate: true,
-    indexName: 'updateTime'
+    indexName: 'updateTime' as keyof T
   }
 ) {
   const loading = ref<boolean>(false)
@@ -51,7 +51,6 @@ export function useQueryDB<T>(
         // @ts-ignore
         data.value.push(...list)
       }
-      console.log(total.value, data.value)
     } catch (e: any) {
       error.value = e
     } finally {

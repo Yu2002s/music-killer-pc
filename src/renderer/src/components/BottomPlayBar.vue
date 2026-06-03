@@ -79,7 +79,9 @@ function onLoopModeChange(e: LoopMode) {
         audioStore.music.name
       }}</router-link>
       <div class="desc">
-        <router-link class="artist" to="">{{ audioStore.music.artist }}</router-link>
+        <router-link class="artist" :to="`/artist/detail?id=${audioStore.music.artistId}`">{{
+          audioStore.music.artist
+        }}</router-link>
         <span class="time"
           >{{ formatDuration(audioStore.progress) }}/{{
             formatDuration(audioStore.music.duration)
@@ -225,7 +227,7 @@ function onLoopModeChange(e: LoopMode) {
 
     .desc {
       font-size: 13px;
-      color: #333;
+      color: #888;
       margin-top: 6px;
 
       .time {

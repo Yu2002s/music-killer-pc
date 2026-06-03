@@ -1,7 +1,8 @@
 import { app, shell, BrowserWindow, ipcMain, globalShortcut } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
-import icon from '../../resources/icon.png?asset'
+import icon from '../../resources/icon.ico?asset'
+import iconPng from '../../resources/icon.png?asset'
 import { handleRequestIPC } from '../utils/request'
 import { checkUpdate } from '../utils/update'
 import handleMusicIPC from './ipc/music'
@@ -16,7 +17,7 @@ function createWindow(): BrowserWindow {
     minHeight: 400,
     show: false,
     autoHideMenuBar: true,
-    ...(process.platform === 'linux' ? { icon } : {}),
+    ...(process.platform === 'linux' ? { icon: iconPng } : { icon }),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,

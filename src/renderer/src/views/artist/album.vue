@@ -1,19 +1,20 @@
 <script setup lang="ts">
-import { useSearchStore } from '@renderer/store/modules/search'
-import { searchAlbum } from '@renderer/api/search'
+import { useRoute } from 'vue-router'
 import usePageRequest from '@renderer/composeable/usePageRequest'
-import AlbumList from '@renderer/components/AlbumList.vue'
+import { getArtistAlbumPage } from '@renderer/api/artist'
 import LoadingLayout from '@renderer/components/LoadingLayout.vue'
+import AlbumList from '@renderer/components/AlbumList.vue'
 
-const searchStore = useSearchStore()
+const route = useRoute()
 
-const { loading, data, error, pageNo, total } = usePageRequest(
-  (pageNo, pageSize) =>
-    searchAlbum({
+const { pageNo, data, error, loading, total } = usePageRequest(
+  (pageNo, pageSize) => {
+    return getArtistAlbumPage({
       pageNo,
       pageSize,
-      keyword: searchStore.keyword
-    }),
+      artistId: +route.query.id as number
+    })
+  },
   {
     immediate: true
   }

@@ -9,8 +9,18 @@
         />
         <div class="lyric-section">
           <div class="music-info">
-            <div class="music-name">{{ audioStore.music.name }}</div>
-            <div class="music-artist">{{ audioStore.music.artist }}</div>
+            <RouterLink
+              :to="`/search?q=${audioStore.music.name}`"
+              class="music-name"
+              @click="close"
+              >{{ audioStore.music.name }}</RouterLink
+            >
+            <router-link
+              class="music-artist"
+              :to="`/artist/detail?id=${audioStore.music.artistId}`"
+              @click="close"
+              >{{ audioStore.music.artist }}</router-link
+            >
           </div>
           <LyricView
             v-model="audioStore.currentTime"
@@ -98,12 +108,14 @@ function onSelectItem(startTime: number) {
     text-align: center;
 
     .music-name {
+      display: block;
       font-size: 18px;
       font-weight: bold;
     }
 
     .music-artist {
-      color: #333;
+      display: block;
+      color: #666;
       font-size: 14px;
       margin-top: 10px;
     }

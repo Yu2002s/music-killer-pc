@@ -3,10 +3,11 @@ import '@mdui/icons/favorite-border.js'
 import '@mdui/icons/favorite.js'
 import '@mdui/icons/play-arrow.js'
 import '@mdui/icons/playlist-add.js'
+import 'mdui/components/snackbar.js'
 import { Music } from '@renderer/api/playlist/types'
 import { useAudioStore } from '@renderer/store/modules/audio'
 import { formatDuration } from '@renderer/utils/time'
-import { watch } from 'vue'
+import { ref, watch } from 'vue'
 
 const audioStore = useAudioStore()
 
@@ -15,6 +16,7 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+const isShowTips = ref(false)
 
 watch(
   props.list,
@@ -39,6 +41,7 @@ function play(_: Music, index: number) {
 
 function addPlay(m: Music) {
   audioStore.addPlay(m, false)
+  isShowTips.value = true
 }
 
 function favorite(m: Music) {
@@ -51,6 +54,10 @@ function getMusicCover(item: Music): string {
     return item.pic120
   }
   return item.pic
+}
+
+function onCloseTips() {
+  isShowTips.value = false
 }
 </script>
 
@@ -68,10 +75,14 @@ function getMusicCover(item: Music): string {
         <router-link class="music-name" :to="`/search?q=${item.name}`" :title="item.name">{{
           item.name
         }}</router-link>
-        <router-link to="" class="music-artist">{{ item.artist }}</router-link>
+        <router-link :to="`/artist/detail?id=${item.artistId}`" class="music-artist">{{
+          item.artist
+        }}</router-link>
       </div>
       <div class="music-album">
-        <router-link to="" class="album-text" :align="item.album">{{ item.album }}</router-link>
+        <router-link :to="`/album/${item.albumId}`" class="album-text" :align="item.album">{{
+          item.album
+        }}</router-link>
       </div>
       <span class="music-duration">{{ formatDuration(item.duration) }}</span>
       <div class="music-control">
@@ -87,6 +98,13 @@ function getMusicCover(item: Music): string {
         </mdui-button-icon>
       </div>
     </div>
+    <mdui-snackbar
+      :open="isShowTips"
+      auto-close-delay="2000"
+      close-on-outside-click
+      @close="onCloseTips"
+      >歌曲已添加</mdui-snackbar
+    >
   </div>
 </template>
 

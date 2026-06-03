@@ -49,7 +49,6 @@ export default function usePageRequest<T>(
 
   if (immediate) {
     onMounted(() => {
-      console.log('onMounted, send')
       send()
     })
   }

@@ -22,6 +22,16 @@ export function getIndexPlayList() {
 }
 
 /**
+ * 获取歌单分类tag列表
+ */
+export function getPlayListTags() {
+  return window.api.request<PlayListTag[]>({
+    url: '/music/playlist/getPlayListTags',
+    method: 'GET'
+  })
+}
+
+/**
  * 通过分类tag获取到歌单列表
  * @param id 分类tag id
  */
@@ -37,8 +47,20 @@ export function getPlayListByTag(id: string) {
  * @param params 查询参数
  */
 export function getPlaylistPage(params: QueryPlaylistParams) {
-  return window.api.request<Page<Music>>({
+  return window.api.request<Page<PlayList>>({
     url: `/music/playlist/page`,
+    data: params,
+    method: 'GET'
+  })
+}
+
+/**
+ * 通过分类tag获取对应的歌单列表
+ * @param params 查询参数
+ */
+export function getTagPlaylistPage(params: QueryPlaylistParams) {
+  return window.api.request<Page<PlayList>>({
+    url: `/music/playlist/getTagPlaylist`,
     data: params,
     method: 'GET'
   })

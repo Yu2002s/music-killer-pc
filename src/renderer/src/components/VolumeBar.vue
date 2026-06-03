@@ -40,7 +40,7 @@ function changeVolume() {
   right: 35px;
   bottom: 80px;
   width: 240px;
-  background-color: #fff;
+  background-color: rgb(var(--mdui-color-surface));
   border-radius: 10px;
   padding: 10px;
   display: flex;

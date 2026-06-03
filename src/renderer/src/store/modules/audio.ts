@@ -55,6 +55,9 @@ export const useAudioStore = defineStore('audio', () => {
     updateTime: Date.now()
   })
 
+  // 音乐播放列表
+  const musicList = ref<Music[]>([])
+
   ;(async function getHistoryMusic() {
     const result = await getPageData<Music>({
       pageNo: 1,
@@ -68,13 +71,10 @@ export const useAudioStore = defineStore('audio', () => {
         music.value = result[0]
         addPlaylist(result)
       } else {
-        Object.assign(music.value, result[0])
+        addPlaylist(result, 0, false)
       }
     }
   })()
-
-  // 音乐播放列表
-  const musicList = ref<Music[]>([])
 
   // 循环模式
   const loopMode = ref<LoopMode>(
@@ -113,6 +113,21 @@ export const useAudioStore = defineStore('audio', () => {
     }
   })
 
+  async function getPlayUrl(id: number, bridge: Bridge) {
+    const playInfo = await getPlayInfo({
+      id,
+      bridge
+    })
+    console.log('playInfo: ', playInfo)
+    audio.src = playInfo.url
+  }
+
+  async function getLyricContent(id: number) {
+    const lyricContent = await getMusicLyric(id)
+    const decryptedLyricContent = await window.api.music.decryptLyric(lyricContent, false)
+    lrcContent.value = decryptedLyricContent
+  }
+
   /**
    * 通过指定码率播放音乐
    * @param id 音乐id
@@ -122,12 +137,7 @@ export const useAudioStore = defineStore('audio', () => {
     if (id === 0) return
     progress.value = 0
     try {
-      const playInfo = await getPlayInfo({
-        id,
-        bridge
-      })
-      console.log('playInfo: ', playInfo)
-      audio.src = playInfo.url
+      await getPlayUrl(id, bridge)
       audio.currentTime = 0
       play()
     } catch (error) {
@@ -145,16 +155,20 @@ export const useAudioStore = defineStore('audio', () => {
     playForBridge(value.id, quality.value)
     // 保存历史数据
     saveHistory(value)
-    const lyricContent = await getMusicLyric(value.id)
-    const decryptedLyricContent = await window.api.music.decryptLyric(lyricContent, false)
-    lrcContent.value = decryptedLyricContent
+    getLyricContent(value.id)
   })
 
   /**
    * 播放音乐
    * @param m 音乐对象
    */
-  function play(m: Music | undefined = undefined) {
+  async function play(m: Music | undefined = undefined) {
+    if (!audio.src) {
+      await getPlayUrl(m?.id || music.value.id, quality.value)
+    }
+    if (!lrcContent.value) {
+      await getLyricContent(m?.id || music.value.id)
+    }
     if (!m) {
       audio.play()
       return
@@ -196,11 +210,20 @@ export const useAudioStore = defineStore('audio', () => {
    * @param play 是否立即播放
    */
   function addPlay(m: Music, play: boolean = true) {
+    const index = musicList.value.findIndex((item) => item.id === m.id)
+    const current = currentIndex.value
+    if (index !== -1) {
+      musicList.value.splice(index, 1)
+    }
     if (play) {
       music.value = m
       musicList.value.unshift(m)
     } else {
-      musicList.value.push(m)
+      if (current >= 0) {
+        musicList.value.splice(current + 1, 0, m)
+      } else {
+        musicList.value.push(m)
+      }
     }
   }
 
@@ -208,14 +231,25 @@ export const useAudioStore = defineStore('audio', () => {
    * 添加播放列表到播放队列
    * @param list 音乐列表
    * @param start 开始位置
+   * @param play 是否立即播放
    */
-  function addPlaylist(list: Music[], start: number = 0) {
+  function addPlaylist(list: Music[], start: number = 0, play: boolean = true) {
     const length = list.length
     if (length === 0) return
     const subCount = Math.min(20, length - start)
     const subList = list.slice(start, start + subCount)
-    music.value = subList[0]
-    musicList.value.unshift(...subList)
+    if (play) {
+      music.value = subList[0]
+    } else {
+      Object.assign(music.value, subList[0])
+    }
+    subList.forEach((item, index) => {
+      if (musicList.value.some((v) => item.id === v.id)) {
+        // 已存在
+        return
+      }
+      musicList.value.splice(index, 0, item)
+    })
   }
 
   /**
@@ -260,6 +294,7 @@ export const useAudioStore = defineStore('audio', () => {
     } else {
       // loop 单曲循环
       setProgress(0)
+      play()
     }
   }
 
@@ -278,6 +313,7 @@ export const useAudioStore = defineStore('audio', () => {
       playRandom()
     } else {
       setProgress(0)
+      play()
     }
   }
 

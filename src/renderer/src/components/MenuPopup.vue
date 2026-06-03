@@ -1,21 +1,21 @@
 <template>
-  <mdui-dropdown>
+  <mdui-dropdown style="--z-index: 99999">
     <div slot="trigger" style="display: inline-block">
       <slot></slot>
     </div>
     <mdui-menu selects="single" :value="currentValue" @change="onChange">
-      <mdui-menu-item v-for="item in dictType" :key="item.label" :value="item.value">{{
-        item.label
-      }}</mdui-menu-item>
+      <mdui-menu-item v-for="item in dictType" :key="item.label" :value="item.value">
+        {{ item.label }}
+      </mdui-menu-item>
     </mdui-menu>
   </mdui-dropdown>
 </template>
 
 <script setup lang="ts">
-import { DictType } from '@renderer/utils/dict';
-import 'mdui/components/dropdown';
-import 'mdui/components/menu';
-import 'mdui/components/menu-item';
+import { DictType } from '@renderer/utils/dict'
+import 'mdui/components/dropdown'
+import 'mdui/components/menu'
+import 'mdui/components/menu-item'
 
 defineProps<{
   currentValue: any
@@ -36,4 +36,4 @@ function onChange(e: any) {
 }
 </script>
 
-<style scoped></style>
+<style lang="scss"></style>

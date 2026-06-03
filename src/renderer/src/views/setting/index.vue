@@ -3,10 +3,16 @@ import 'mdui/components/list'
 import 'mdui/components/list-item'
 import 'mdui/components/list-subheader.js'
 import 'mdui/components/switch'
-import { getSavedDictValue, saveDictValue } from '@renderer/utils/dict'
+import { getDictLabel, getSavedDictValue, saveDictValue } from '@renderer/utils/dict'
 import { statusDict } from '@renderer/dict/common'
 import { StorageKey } from '@renderer/enums/storage'
 import { Status } from '@renderer/enums/common'
+import { themeDict } from '@renderer/dict/theme'
+import { Theme } from '@renderer/enums/theme'
+import MenuPopup from '@renderer/components/MenuPopup.vue'
+import { useLayoutStore } from '@renderer/store/modules/layout'
+
+const layoutStore = useLayoutStore()
 
 function onAutoPlayStatusChange(e: any) {
   saveDictValue(
@@ -14,6 +20,10 @@ function onAutoPlayStatusChange(e: any) {
     StorageKey.AUTO_PLAY,
     e.target.checked ? Status.ENABLED : Status.DISABLED
   )
+}
+
+function onThemeChange(theme: Theme) {
+  layoutStore.setTheme(theme)
 }
 </script>
 
@@ -29,6 +39,20 @@ function onAutoPlayStatusChange(e: any) {
         >
         </mdui-switch>
       </mdui-list-item>
+      <mdui-list-subheader>显示</mdui-list-subheader>
+      <mdui-list-item headline="深色模式">
+        <div slot="end-icon" style="line-height: initial">
+          <MenuPopup
+            :dict-type="themeDict"
+            :current-value="layoutStore.theme"
+            @on-menu-item-click="onThemeChange"
+          >
+            <mdui-button variant="text">{{
+              getDictLabel(themeDict, layoutStore.theme, Theme.AUTO)
+            }}</mdui-button>
+          </MenuPopup>
+        </div>
+      </mdui-list-item>
       <mdui-list-subheader>关于</mdui-list-subheader>
       <mdui-list-item
         headline="作者"
@@ -38,8 +62,14 @@ function onAutoPlayStatusChange(e: any) {
       ></mdui-list-item>
       <mdui-list-item
         headline="其他App下载"
+        description="更新App或下载其他App"
         target="_blank"
         href="http://app.jdynb.xyz"
+      ></mdui-list-item>
+      <mdui-list-item
+        headline="Github"
+        target="_blank"
+        href="https://github.com/yu2002s/music-killer-pc"
       ></mdui-list-item>
     </mdui-list>
   </div>

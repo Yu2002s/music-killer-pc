@@ -3,6 +3,7 @@ import '@mdui/icons/clear-all.js'
 import '@mdui/icons/clear.js'
 import '@mdui/icons/favorite-border.js'
 import '@mdui/icons/favorite.js'
+import '@mdui/icons/location-on'
 import { Music } from '@renderer/api/playlist/types'
 import { useAudioStore } from '@renderer/store/modules/audio'
 
@@ -20,15 +21,24 @@ function deleteItem(item: Music) {
 function clearAll() {
   audioStore.clearPlaylist()
 }
+
+function locationMusic() {
+  document.querySelector('.music-item.active').scrollIntoView({ behavior: 'smooth' })
+}
 </script>
 
 <template>
   <div class="playlist-content">
     <div class="playlist-header">
       <div class="playlist-title">播放队列({{ audioStore.musicList.length }})</div>
-      <mdui-button-icon title="清空队列" @click="clearAll">
-        <mdui-icon-clear-all></mdui-icon-clear-all>
-      </mdui-button-icon>
+      <div>
+        <mdui-button-icon title="定位歌曲" @click="locationMusic">
+          <mdui-icon-location-on></mdui-icon-location-on>
+        </mdui-button-icon>
+        <mdui-button-icon title="清空队列" @click="clearAll">
+          <mdui-icon-clear-all></mdui-icon-clear-all>
+        </mdui-button-icon>
+      </div>
     </div>
     <div class="music-list">
       <div
@@ -43,7 +53,9 @@ function clearAll() {
           <router-link :to="`/search?q=${item.name}`" class="music-name" :title="item.name">{{
             item.name
           }}</router-link>
-          <router-link to="" class="music-artist">{{ item.artist }}</router-link>
+          <router-link :to="`/artist/detail?id=${item.artistId}`" class="music-artist">{{
+            item.artist
+          }}</router-link>
         </div>
         <mdui-button-icon
           title="收藏/取消收藏"
@@ -72,7 +84,7 @@ function clearAll() {
   display: flex;
   flex-direction: column;
   padding: 10px;
-  background-color: #fff;
+  background-color: rgba(var(--mdui-color-surface));
   border-radius: 10px;
   box-shadow:
     0 4px 8px 0 rgba(0, 0, 0, 0.2),

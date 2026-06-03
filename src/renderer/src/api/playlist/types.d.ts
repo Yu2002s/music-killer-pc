@@ -14,6 +14,10 @@ export interface PlayListTag {
    * 标签名称
    */
   name?: string
+  /**
+   * 子集
+   */
+  data?: PlayListTag[]
   [property: string]: any
 }
 

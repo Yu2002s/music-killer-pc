@@ -5,6 +5,7 @@ import LoadingLayout from '@renderer/components/LoadingLayout.vue'
 import useRequest from '@renderer/composeable/useRequest'
 import useWindow from '@renderer/composeable/useWindow'
 import { onMounted, ref, watch } from 'vue'
+import GridPlayList from '@renderer/components/GridPlayList.vue'
 
 const currentPlaylistTab = ref('')
 
@@ -23,7 +24,7 @@ const { data: playListTags, send: getPlaylistTags } = useRequest(getIndexPlayLis
   }
 })
 
-const { data: musicList, send: getPlaylistMusic } = useRequest(
+const { data: playList, send: getPlaylistMusic } = useRequest(
   (id: string) => {
     if (!id) {
       return getIndexPlayList()
@@ -33,7 +34,8 @@ const { data: musicList, send: getPlaylistMusic } = useRequest(
   {
     transform: (data) => {
       return data.data
-    }
+    },
+    defaultData: []
   }
 )
 
@@ -54,8 +56,6 @@ watch(
     immediate: false
   }
 )
-
-const { column } = useWindow()
 
 onMounted(async () => {
   try {
@@ -83,31 +83,8 @@ function onChange(e: any) {
     }}</mdui-tab>
   </mdui-tabs>
   <loading-layout :loading="loading" :error="error">
-    <grid-view :column="column" style="margin-top: 8px">
-      <router-link
-        v-for="item in musicList"
-        :key="item.id"
-        :to="`/playlist/detail?id=${item.id}`"
-        class="playlist-item"
-      >
-        <img :alt="item.name" :src="item.img" class="playlist-img" />
-        <span class="playlist-name">{{ item.name }}</span>
-      </router-link>
-    </grid-view>
+    <GridPlayList :play-list="playList" />
   </loading-layout>
 </template>
 
-<style scoped lang="scss">
-.playlist-item {
-  cursor: pointer;
-
-  .playlist-img {
-    width: 100%;
-    border-radius: 10px;
-  }
-
-  .playlist-name {
-    font-size: 14px;
-  }
-}
-</style>
+<style scoped lang="scss"></style>
