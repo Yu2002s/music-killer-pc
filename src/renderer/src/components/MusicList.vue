@@ -13,9 +13,15 @@ const audioStore = useAudioStore()
 
 interface Props {
   list: Music[]
+  /**
+   * 点击播放时是否添加列表音乐
+   */
+  addListOnPlay?: boolean
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  addListOnPlay: true
+})
 const isShowTips = ref(false)
 
 watch(
@@ -35,8 +41,12 @@ watch(
   }
 )
 
-function play(_: Music, index: number) {
-  audioStore.addPlaylist(props.list, index)
+function play(m: Music, index: number) {
+  if (props.addListOnPlay) {
+    audioStore.addPlaylist(props.list, index)
+  } else {
+    audioStore.addPlay(m, true)
+  }
 }
 
 function addPlay(m: Music) {

@@ -7,7 +7,7 @@
     :error="error"
     :loading="loading"
   >
-    <MusicList :list="data" />
+    <MusicList :list="data" :add-list-on-play="false" />
   </LoadingLayout>
 </template>
 

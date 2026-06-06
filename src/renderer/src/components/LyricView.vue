@@ -9,8 +9,11 @@
         :class="{ active: isActive(item) }"
         @click="selectItem(item.startTime)"
       >
-        <span v-for="word in item.words" :key="String(word.startTime) + word">{{ word.word }}</span>
-        <div v-if="item.translatedLyric" class="translate">{{ item.translatedLyric }}</div>
+        <div class="lyric-line">{{ getLyricLine(item) }}</div>
+        <!--        <span v-for="word in item.words" :key="String(word.startTime) + word">{{ word.word }}</span>-->
+        <div v-if="item.translatedLyric" class="lyric-line translate">
+          {{ item.translatedLyric }}
+        </div>
       </li>
       <li style="height: 300px"></li>
     </ul>
@@ -59,6 +62,10 @@ watch(
     flush: 'post'
   }
 )
+
+function getLyricLine(word: LyricLine) {
+  return word.words.map((item) => item.word).join('')
+}
 
 const resizeListener = () => {
   getContainerHeight()
@@ -130,6 +137,10 @@ function selectItem(startTime: number) {
       margin: 10px 0;
       transition: transform 0.2s ease-in;
       cursor: pointer;
+
+      .lyric-line {
+        word-break: break-word;
+      }
 
       &.active {
         transform: scale(1.2);

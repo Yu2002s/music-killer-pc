@@ -65,8 +65,8 @@ function onLoadMore() {
     <mdui-circular-progress></mdui-circular-progress>
   </div>
   <div v-else-if="error && pageNo === 1">
-    <p>{{ showMessage }}</p>
-    <mdui-button @click="refresh">刷新</mdui-button>
+    <p>{{ showMessage }}，请重新打开此页面</p>
+    <mdui-button v-if="false" @click="refresh">刷新</mdui-button>
   </div>
   <template v-else>
     <slot></slot>

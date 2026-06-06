@@ -72,6 +72,7 @@ export const useAudioStore = defineStore('audio', () => {
         addPlaylist(result)
       } else {
         addPlaylist(result, 0, false)
+        getLyricContent(result[0].id)
       }
     }
   })()
@@ -217,7 +218,7 @@ export const useAudioStore = defineStore('audio', () => {
     }
     if (play) {
       music.value = m
-      musicList.value.unshift(m)
+      musicList.value.splice(current + 1, 0, m)
     } else {
       if (current >= 0) {
         musicList.value.splice(current + 1, 0, m)

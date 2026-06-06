@@ -18,6 +18,9 @@ declare global {
       music: {
         buildParams: (musicId: number, isGetLyricx: boolean) => Promise<string>
         decryptLyric: (lyricContent: ArrayBuffer, isGetLyricx: boolean) => Promise<string>
+        showLyric: (isShow: boolean) => void
+        exportMusic: (content: string) => Promise<void>
+        importMusic: () => Promise<string>
       },
 
       update: {

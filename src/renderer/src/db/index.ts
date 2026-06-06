@@ -37,6 +37,20 @@ function UPGRADE_2_3(db: IDBDatabase) {
   store.createIndex('updateTime', 'updateTime')
 }
 
+function UPGRADE_3_4(db: IDBDatabase) {
+  const store = db.createObjectStore(DBStoreName.FAVORITE_PLAYLIST, {
+    keyPath: 'id'
+  })
+
+  store.createIndex('id', 'id', {
+    unique: true
+  })
+
+  store.createIndex('updateTime', 'updateTime')
+
+  store.createIndex('name', 'name')
+}
+
 export function openDB() {
   let _db: IDBDatabase | null = null
 
@@ -44,7 +58,7 @@ export function openDB() {
     if (_db !== null) return Promise.resolve(_db)
 
     return new Promise((resolve, reject) => {
-      const request = window.indexedDB.open('music', 3)
+      const request = window.indexedDB.open('music', 4)
       let isShowError = false
       request.onerror = () => {
         console.error('数据库连接失败')
@@ -83,6 +97,9 @@ export function openDB() {
             case 3:
               UPGRADE_2_3(db)
               break
+            case 4:
+              UPGRADE_3_4(db)
+              break
           }
         }
       }
@@ -97,8 +114,8 @@ export async function addData<T>(storeName: string, data: T) {
     .add(toRaw(data))
 
   return new Promise((resolve, reject) => {
-    request.onerror = () => {
-      console.error('插入数据失败')
+    request.onerror = (error) => {
+      console.error('插入数据失败: ', error)
       reject(new Error('插入数据失败'))
     }
     request.onsuccess = () => {
@@ -114,8 +131,8 @@ export async function updateData<T>(storeName: string, data: T) {
     .put(toRaw(data))
 
   return new Promise((resolve, reject) => {
-    request.onerror = () => {
-      console.error('更新数据失败')
+    request.onerror = (error) => {
+      console.error('更新数据失败: ', error)
       reject(new Error('更新数据失败'))
     }
     request.onsuccess = () => {
@@ -227,6 +244,19 @@ export async function getPageData<T>(params: QueryPageParams<T>) {
 
     request.onerror = () => {
       reject(new Error('分页查询失败'))
+    }
+  })
+}
+
+export async function clearData(storeName: string) {
+  const db = await openDB()()
+  return new Promise((resolve, reject) => {
+    const request = db.transaction([storeName], 'readwrite').objectStore(storeName).clear()
+    request.onsuccess = () => {
+      resolve(true)
+    }
+    request.onerror = () => {
+      reject(new Error('清除数据失败'))
     }
   })
 }

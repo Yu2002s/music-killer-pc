@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import Material3Tab from '@renderer/components/Material3Tab.vue'
-import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { computed } from 'vue'
 
 const route = useRoute()
 const router = useRouter()
+const artistId = route.query.id as string
 
 const tabList = [
   {
@@ -25,7 +26,7 @@ const currentIndex = computed({
     router.replace({
       path: tabList[val].path,
       query: {
-        id: route.query.id as string
+        id: artistId
       }
     })
   }

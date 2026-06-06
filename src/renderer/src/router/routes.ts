@@ -145,5 +145,9 @@ export default [
     meta: {
       title: '专辑歌曲'
     }
+  },
+  {
+    path: '/lyric',
+    component: () => import('@renderer/views/lyric/index.vue')
   }
 ] as readonly RouteRecordRaw[]

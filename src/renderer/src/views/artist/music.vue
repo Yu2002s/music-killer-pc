@@ -9,11 +9,11 @@ import { onMounted } from 'vue'
 const route = useRoute()
 
 const { pageNo, data, error, loading, total, send, refresh } = usePageRequest(
-  (pageNo, pageSize, artistId) => {
+  (pageNo, pageSize, artistId: number) => {
     return getArtistMusicPage({
       pageNo,
       pageSize,
-      artistId
+      artistId: artistId || (+route.query.id as number)
     })
   }
 )

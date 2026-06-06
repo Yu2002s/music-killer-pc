@@ -15,7 +15,7 @@ const { loading, data, error, pageNo, total } = usePageRequest(
       keyword: searchStore.keyword
     }),
   {
-    immediate: true
+    immediate: !!searchStore.keyword
   }
 )
 </script>

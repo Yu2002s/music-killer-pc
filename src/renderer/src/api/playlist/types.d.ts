@@ -68,6 +68,10 @@ export interface PlayList {
    * 用户名
    */
   uname: string
+  /**
+   * 更新时间
+   */
+  updateTime: number
   [property: string]: any
 }
 

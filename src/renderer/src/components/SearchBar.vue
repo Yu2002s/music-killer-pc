@@ -111,6 +111,7 @@ function onDeleteKey(name: string) {
 
 <style scoped lang="scss">
 .search-bar {
+  position: relative;
   display: flex;
   align-items: center;
 
@@ -124,7 +125,7 @@ function onDeleteKey(name: string) {
     position: absolute;
     width: 250px;
     display: none;
-    top: 50px;
+    top: 30px;
 
     .divider {
       height: 1px;
@@ -138,7 +139,7 @@ function onDeleteKey(name: string) {
     z-index: 2;
     width: 24px;
     height: 24px;
-    right: 65px;
+    right: 10px;
   }
 
   .search-input {

@@ -7,6 +7,7 @@ import '@mdui/icons/home.js'
 import '@mdui/icons/refresh.js'
 import '@mdui/icons/search.js'
 import '@mdui/icons/settings.js'
+import '@mdui/icons/location-on.js'
 import BottomPlayBar from '@renderer/components/BottomPlayBar.vue'
 import routes from '@renderer/router/routes'
 import 'mdui/components/bottom-app-bar.js'
@@ -102,6 +103,10 @@ function onSearchSubmit(e: string) {
 function onUpdate() {
   window.api.update.startDownloadUpdate()
 }
+
+function location() {
+  document.querySelector('.music-item.active').scrollIntoView({ behavior: 'smooth' })
+}
 </script>
 
 <template>
@@ -147,6 +152,9 @@ function onUpdate() {
           style="margin-right: 10px"
           @on-submit="onSearchSubmit"
         />
+        <mdui-button-icon @click="location">
+          <mdui-icon-location-on></mdui-icon-location-on>
+        </mdui-button-icon>
         <mdui-button-icon @click="refresh">
           <mdui-icon-refresh></mdui-icon-refresh>
         </mdui-button-icon>

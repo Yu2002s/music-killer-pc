@@ -23,7 +23,9 @@ function clearAll() {
 }
 
 function locationMusic() {
-  document.querySelector('.music-item.active').scrollIntoView({ behavior: 'smooth' })
+  document
+    .querySelector('.playlist-content .music-item.active')
+    .scrollIntoView({ behavior: 'smooth' })
 }
 </script>
 

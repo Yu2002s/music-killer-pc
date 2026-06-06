@@ -19,20 +19,19 @@
     "typecheck:web": "vue-tsc --noEmit -p tsconfig.web.json --composite false",
     "typecheck": "npm run typecheck:node && npm run typecheck:web",
     "start": "electron-vite preview",
-    "dev": "electron-vite dev",
+    "dev": "electron-vite dev --watch",
     "build": "npm run typecheck && electron-vite build",
     "postinstall": "electron-builder install-app-deps",
     "build:unpack": "npm run build && electron-builder --dir",
-    "build:win": "npm run build && electron-builder --win --publish always",
-    "build:mac": "npm run build && electron-builder --mac --publish always",
-    "build:linux": "npm run build && electron-builder --linux --publish always"
+    "build:win": "npm run build && electron-builder --win --publish onTag",
+    "build:mac": "npm run build && electron-builder --mac --publish onTag",
+    "build:linux": "npm run build && electron-builder --linux --publish onTag"
   },
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.2",
     "@electron-toolkit/utils": "^4.0.0",
     "electron-log": "^5.4.4",
-    "electron-updater": "^6.3.9",
-    "update-electron-app": "^3.2.0"
+    "electron-updater": "^6.3.9"
   },
   "devDependencies": {
     "@applemusic-like-lyrics/lyric": "^1.0.1",

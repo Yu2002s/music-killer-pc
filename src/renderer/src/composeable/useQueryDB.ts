@@ -64,11 +64,20 @@ export function useQueryDB<T>(
     }
   })
 
+  function refresh() {
+    if (pageNo.value === 1) {
+      query()
+    } else {
+      pageNo.value = 1
+    }
+  }
+
   return {
     query,
+    refresh,
     error,
     loading,
-    data,
+    data: data,
     pageNo,
     pageSize,
     total
